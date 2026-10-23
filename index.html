@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>ระบบสต๊อกของร้านติดใจ & เติมของร้านติดใจ (Mobile Edition)</title>
-  <meta property="og:title" content="ระบบสต๊อกของ & เติมของ" />
-  <meta property="og:description" content="ระบบจัดการสต๊อก คำนวณการปรุง และเติมของประจำวัน" />
+  <meta property="og:title" content="ระบบสต๊อกของ & เติมของ & ยอดขาย" />
+  <meta property="og:description" content="ระบบจัดการสต๊อก คำนวณการปรุง เติมของประจำวัน และบันทึกยอดขาย" />
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -1310,12 +1310,13 @@
     // MAIN APP COMPONENT
     // ==========================================
     function App() {
-      const [activeTab, setActiveTab] = useState('production');
+      const [activeTab, setActiveTab] = useState('sales'); // แท็บเริ่มต้นเปลี่ยนเป็น 'sales'
       const [isBomUnlocked, setIsBomUnlocked] = useState(false);
 
       const [stocks, setStocks] = useState([]);
       const [recipes, setRecipes] = useState([]);
       const [logs, setLogs] = useState([]);
+      const [salesLogs, setSalesLogs] = useState([]);
       const [categories, setCategories] = useState([]);
       const [loading, setLoading] = useState(true);
 
@@ -1326,6 +1327,18 @@
       const [searchRecipe, setSearchRecipe] = useState('');
       const [searchHistory, setSearchHistory] = useState('');
       const [searchMovement, setSearchMovement] = useState('');
+
+      // Sales Input State
+      const [selectedRecipeForSale, setSelectedRecipeForSale] = useState('');
+      const [cupsSold, setCupsSold] = useState(1);
+      const [pricePerCup, setPricePerCup] = useState(35);
+      const [saleNote, setSaleNote] = useState('');
+
+      // Month Filter State for Sales Summary
+      const [selectedMonth, setSelectedMonth] = useState(() => {
+        const d = new Date();
+        return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2, '0')}`;
+      });
 
       const [batchQuantities, setBatchQuantities] = useState({});
       const [productionNote, setProductionNote] = useState('');
@@ -1394,11 +1407,25 @@
           setLogs(data);
         });
 
+        const unsubSales = db.collection('sales').onSnapshot(snapshot => {
+          const data = snapshot.docs.map(doc => {
+            const docData = doc.data();
+            return {
+              id: doc.id,
+              ...docData,
+              createdTime: docData.timestamp ? docData.timestamp.toMillis() : Date.now()
+            };
+          });
+          data.sort((a, b) => b.createdTime - a.createdTime);
+          setSalesLogs(data);
+        });
+
         return () => {
           unsubCategories();
           unsubStocks();
           unsubRecipes();
           unsubLogs();
+          unsubSales();
         };
       }, []);
 
@@ -1415,6 +1442,82 @@
           setActiveTab(tabName);
         }
       };
+
+      // --- Record Sales Handler ---
+      const handleRecordSale = async (e) => {
+        e.preventDefault();
+        if (!selectedRecipeForSale) return alert('กรุณาเลือกเมนูเครื่องดื่ม');
+        if (cupsSold <= 0) return alert('กรุณาระบุจำนวนแก้วให้ถูกต้อง');
+        if (pricePerCup <= 0) return alert('กรุณาระบุราคาต่อแก้ว');
+
+        const recipe = recipes.find(r => r.id === selectedRecipeForSale);
+        const totalAmount = cupsSold * pricePerCup;
+
+        try {
+          const now = new Date();
+          const day = now.getDate().toString().padStart(2, '0');
+          const month = (now.getMonth() + 1).toString().padStart(2, '0');
+          const year = now.getFullYear();
+          const yearTH = year + 543;
+          const hours = now.getHours().toString().padStart(2, '0');
+          const mins = now.getMinutes().toString().padStart(2, '0');
+          const timeStr = `${day}/${month}/${yearTH} ${hours}:${mins} น.`;
+          const dateISO = `${year}-${month}-${day}`;
+
+          await db.collection('sales').add({
+            recipeId: selectedRecipeForSale,
+            menuName: recipe ? recipe.name : 'เครื่องดื่ม',
+            cups: Number(cupsSold),
+            pricePerCup: Number(pricePerCup),
+            totalAmount: Number(totalAmount),
+            note: saleNote || '',
+            datetime: timeStr,
+            dateISO: dateISO,
+            monthKey: `${year}-${month}`,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          });
+
+          alert(`บันทึกการขายเรียบร้อย! รวมเป็นเงิน ${totalAmount.toLocaleString()} บาท`);
+          setCupsSold(1);
+          setSaleNote('');
+        } catch (err) {
+          console.error(err);
+          alert('เกิดข้อผิดพลาดในการบันทึกยอดขาย');
+        }
+      };
+
+      const handleDeleteSale = async (id) => {
+        if (confirm('คุณต้องการลบรายการขายนี้ใช่หรือไม่?')) {
+          await db.collection('sales').doc(id).delete();
+        }
+      };
+
+      // --- Sales Calculations ---
+      const todayISO = useMemo(() => {
+        const d = new Date();
+        const year = d.getFullYear();
+        const month = (d.getMonth() + 1).toString().padStart(2, '0');
+        const day = d.getDate().toString().padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      }, []);
+
+      const todaySalesSummary = useMemo(() => {
+        const todayLogs = salesLogs.filter(s => s.dateISO === todayISO);
+        const totalMoney = todayLogs.reduce((acc, curr) => acc + (curr.totalAmount || 0), 0);
+        const totalCups = todayLogs.reduce((acc, curr) => acc + (curr.cups || 0), 0);
+        return { totalMoney, totalCups, count: todayLogs.length };
+      }, [salesLogs, todayISO]);
+
+      const monthSalesSummary = useMemo(() => {
+        const monthLogs = salesLogs.filter(s => s.monthKey === selectedMonth);
+        const totalMoney = monthLogs.reduce((acc, curr) => acc + (curr.totalAmount || 0), 0);
+        const totalCups = monthLogs.reduce((acc, curr) => acc + (curr.cups || 0), 0);
+        
+        const uniqueDays = new Set(monthLogs.map(s => s.dateISO)).size;
+        const avgDailyMoney = uniqueDays > 0 ? Math.round(totalMoney / uniqueDays) : 0;
+
+        return { totalMoney, totalCups, count: monthLogs.length, uniqueDays, avgDailyMoney, monthLogs };
+      }, [salesLogs, selectedMonth]);
 
       const handleToggleShowDetails = (logId) => {
         if (unlockedLogDetails[logId]) {
@@ -1887,14 +1990,19 @@
                   </div>
                   <div>
                     <h1 className="font-bold text-slate-800 text-base sm:text-lg tracking-tight leading-none">ร้านติดใจ</h1>
-                    <p className="text-[10px] text-slate-400 font-medium mt-0.5">ระบบจัดการวัตถุดิบ & สต๊อกน้ำปรุง</p>
+                    <p className="text-[10px] text-slate-400 font-medium mt-0.5">ระบบจัดการวัตถุดิบ & เช็คยอดขาย</p>
                   </div>
                 </div>
 
                 <div className="flex items-center space-x-1.5 sm:space-x-2">
+                  <button onClick={() => setActiveTab('salesSummary')} className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-md transition">
+                    <i data-lucide="trending-up" className="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+                    <span>ยอดขายวันนี้: {todaySalesSummary.totalMoney.toLocaleString()} ฿</span>
+                  </button>
+
                   <button onClick={() => setPrintModalOpen(true)} className="bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-md transition">
                     <i data-lucide="printer" className="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
-                    <span className="hidden sm:inline">สรุปรายงานประจำวัน</span>
+                    <span className="hidden sm:inline">รายงานประจำวัน</span>
                   </button>
 
                   {lowStockItems.length > 0 && (
@@ -1906,8 +2014,19 @@
                 </div>
               </div>
 
+              {/* Navigation Bar */}
               <div className="bg-slate-100/80 p-1.5 border-t border-slate-200/60">
                 <div className="max-w-7xl mx-auto flex space-x-1 overflow-x-auto no-scrollbar justify-start sm:justify-center px-2">
+                  <button onClick={() => handleTabChange('sales')} className={`flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'sales' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>
+                    <i data-lucide="shopping-cart" className="w-4 h-4"></i>
+                    <span>💰 บันทึกยอดขาย</span>
+                  </button>
+
+                  <button onClick={() => handleTabChange('salesSummary')} className={`flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'salesSummary' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>
+                    <i data-lucide="bar-chart-3" className="w-4 h-4"></i>
+                    <span>📊 สรุปยอดขาย</span>
+                  </button>
+
                   <button onClick={() => handleTabChange('production')} className={`flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'production' ? 'bg-white text-emerald-600 shadow-sm border border-slate-200' : 'text-slate-600 hover:text-slate-900'}`}>
                     <i data-lucide="flame" className="w-4 h-4"></i>
                     <span>สั่งปรุงน้ำปรุง</span>
@@ -1945,6 +2064,228 @@
                 <div className="text-center py-20 text-slate-400 font-medium text-sm">กำลังโหลดข้อมูลระบบ...</div>
               ) : (
                 <>
+                  {/* TAB 0-A: บันทึกยอดขาย (Sales Input) */}
+                  {activeTab === 'sales' && (
+                    <div className="max-w-xl mx-auto bg-white rounded-3xl p-5 sm:p-8 border border-slate-200 custom-shadow">
+                      <div className="mb-6 pb-3 border-b border-slate-100 text-center">
+                        <h2 className="text-xl font-bold text-slate-800 flex items-center justify-center gap-2">
+                          <span>💰</span> บันทึกขายเครื่องดื่มหน้าร้าน
+                        </h2>
+                        <p className="text-xs text-slate-400 mt-1">คีย์ยอดขายรายแก้ว เพื่อให้ระบบคำนวณเงินและสรุปยอดขายอัตโนมัติ</p>
+                      </div>
+
+                      <form onSubmit={handleRecordSale} className="space-y-4">
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 mb-1">เลือกเมนูเครื่องดื่ม <span className="text-rose-500">*</span></label>
+                          <select
+                            value={selectedRecipeForSale}
+                            onChange={(e) => setSelectedRecipeForSale(e.target.value)}
+                            required
+                            className="w-full px-4 py-3 text-sm rounded-xl custom-input font-bold"
+                          >
+                            <option value="">-- กรุณาเลือกเมนู --</option>
+                            {recipes.map(r => (
+                              <option key={r.id} value={r.id}>{r.name}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-xs font-bold text-slate-700 mb-1">จำนวน (แก้ว) <span className="text-rose-500">*</span></label>
+                            <div className="flex items-center">
+                              <button
+                                type="button"
+                                onClick={() => setCupsSold(prev => Math.max(1, prev - 1))}
+                                className="w-10 h-11 bg-slate-100 hover:bg-slate-200 font-bold rounded-l-xl text-slate-700 border border-r-0 border-slate-300"
+                              >
+                                -
+                              </button>
+                              <input
+                                type="number"
+                                min="1"
+                                value={cupsSold}
+                                onChange={(e) => setCupsSold(Math.max(1, parseInt(e.target.value) || 1))}
+                                className="w-full h-11 px-2 text-center text-base font-extrabold custom-input rounded-none"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => setCupsSold(prev => prev + 1)}
+                                className="w-10 h-11 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-r-xl border border-l-0 border-emerald-500"
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-bold text-slate-700 mb-1">ราคาต่อแก้ว (บาท) <span className="text-rose-500">*</span></label>
+                            <input
+                              type="number"
+                              min="0"
+                              value={pricePerCup}
+                              onChange={(e) => setPricePerCup(Number(e.target.value))}
+                              required
+                              className="w-full h-11 px-4 text-base font-extrabold custom-input text-center text-emerald-600"
+                            />
+                          </div>
+                        </div>
+
+                        {/* ปุ่มตัวเลือกระบุราคาลัด */}
+                        <div className="flex items-center gap-2">
+                          <span className="text-[11px] text-slate-400 font-bold">ราคาด่วน:</span>
+                          {[25, 30, 35, 40, 45, 50].map(p => (
+                            <button
+                              key={p}
+                              type="button"
+                              onClick={() => setPricePerCup(p)}
+                              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition ${pricePerCup === p ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                            >
+                              {p}฿
+                            </button>
+                          ))}
+                        </div>
+
+                        {/* แสดงยอดเงินรวม */}
+                        <div className="bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 text-center my-2">
+                          <span className="text-xs font-bold text-emerald-800 uppercase block">ยอดเงินรวมชำระ</span>
+                          <span className="text-3xl font-black text-emerald-600">
+                            {(cupsSold * pricePerCup).toLocaleString()} <span className="text-sm font-normal">บาท</span>
+                          </span>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 mb-1">หมายเหตุ (ถ้ามี)</label>
+                          <input
+                            type="text"
+                            placeholder="เช่น หวานน้อย / เพิ่มท็อปปิ้ง..."
+                            value={saleNote}
+                            onChange={(e) => setSaleNote(e.target.value)}
+                            className="w-full px-4 py-2.5 text-xs rounded-xl custom-input"
+                          />
+                        </div>
+
+                        <button
+                          type="submit"
+                          className="w-full py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-base rounded-2xl shadow-lg shadow-emerald-500/25 transition active:scale-98 flex items-center justify-center gap-2"
+                        >
+                          <i data-lucide="check-circle" className="w-5 h-5"></i> ยืนยันการบันทึกขาย
+                        </button>
+                      </form>
+                    </div>
+                  )}
+
+                  {/* TAB 0-B: สรุปยอดขาย (Sales Summary) */}
+                  {activeTab === 'salesSummary' && (
+                    <div className="space-y-6">
+                      {/* สรุปรายวัน */}
+                      <div className="bg-white rounded-3xl p-5 sm:p-8 border border-slate-200 custom-shadow">
+                        <div className="flex justify-between items-center pb-4 border-b border-slate-100 mb-4">
+                          <div>
+                            <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                              <span>📅</span> สรุปยอดขายวันนี้ (รายวัน)
+                            </h2>
+                            <p className="text-xs text-slate-400 mt-0.5">ประจำวันที่ {new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                          <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 text-center">
+                            <span className="text-xs font-bold text-emerald-700 block">ยอดขายรวมวันนี้</span>
+                            <span className="text-2xl sm:text-3xl font-black text-emerald-600 mt-1 block">
+                              {todaySalesSummary.totalMoney.toLocaleString()} <span className="text-xs font-normal">บาท</span>
+                            </span>
+                          </div>
+
+                          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-center">
+                            <span className="text-xs font-bold text-amber-700 block">จำนวนแก้วที่ขายได้</span>
+                            <span className="text-2xl sm:text-3xl font-black text-amber-600 mt-1 block">
+                              {todaySalesSummary.totalCups.toLocaleString()} <span className="text-xs font-normal">แก้ว</span>
+                            </span>
+                          </div>
+
+                          <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-4 text-center">
+                            <span className="text-xs font-bold text-indigo-700 block">จำนวนออเดอร์</span>
+                            <span className="text-2xl sm:text-3xl font-black text-indigo-600 mt-1 block">
+                              {todaySalesSummary.count} <span className="text-xs font-normal">รายการ</span>
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* สรุปรายเดือน */}
+                      <div className="bg-white rounded-3xl p-5 sm:p-8 border border-slate-200 custom-shadow">
+                        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 pb-4 border-b border-slate-100 mb-4">
+                          <div>
+                            <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                              <span>📊</span> สรุปยอดขายรายเดือน
+                            </h2>
+                            <p className="text-xs text-slate-400 mt-0.5">เลือกเดือนเพื่อดูสถิติการขายและภาพรวมรายได้</p>
+                          </div>
+
+                          {/* เลือกเดือน */}
+                          <input
+                            type="month"
+                            value={selectedMonth}
+                            onChange={(e) => setSelectedMonth(e.target.value)}
+                            className="px-4 py-2 text-sm rounded-xl custom-input font-bold"
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                          <div className="bg-slate-900 text-white rounded-2xl p-4 text-center">
+                            <span className="text-xs font-semibold text-slate-400 block">รายได้สะสมประจำเดือน</span>
+                            <span className="text-2xl sm:text-3xl font-black text-emerald-400 mt-1 block">
+                              {monthSalesSummary.totalMoney.toLocaleString()} <span className="text-xs font-normal text-slate-300">บาท</span>
+                            </span>
+                          </div>
+
+                          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-center">
+                            <span className="text-xs font-bold text-slate-600 block">จำนวนแก้วรวมประจำเดือน</span>
+                            <span className="text-2xl sm:text-3xl font-black text-slate-800 mt-1 block">
+                              {monthSalesSummary.totalCups.toLocaleString()} <span className="text-xs font-normal">แก้ว</span>
+                            </span>
+                          </div>
+
+                          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-center">
+                            <span className="text-xs font-bold text-slate-600 block">ยอดขายเฉลี่ยต่อวัน</span>
+                            <span className="text-2xl sm:text-3xl font-black text-indigo-600 mt-1 block">
+                              {monthSalesSummary.avgDailyMoney.toLocaleString()} <span className="text-xs font-normal">บาท/วัน</span>
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* ประวัติการขายในเดือนนี้ */}
+                        <div>
+                          <h3 className="font-bold text-sm text-slate-700 mb-3">ประวัติรายการขาย ({monthSalesSummary.monthLogs.length} รายการ)</h3>
+                          {monthSalesSummary.monthLogs.length === 0 ? (
+                            <div className="text-center py-8 text-slate-400 text-xs italic">ไม่มีข้อมูลการขายในเดือนนี้</div>
+                          ) : (
+                            <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1">
+                              {monthSalesSummary.monthLogs.map(log => (
+                                <div key={log.id} className="bg-slate-50 border border-slate-200 p-3 rounded-2xl flex items-center justify-between gap-2 text-xs">
+                                  <div>
+                                    <span className="font-bold text-slate-800 text-sm block">{log.menuName}</span>
+                                    <span className="text-slate-400 text-[11px]">{log.datetime} {log.note ? `• ${log.note}` : ''}</span>
+                                  </div>
+                                  <div className="flex items-center gap-3">
+                                    <div className="text-right">
+                                      <span className="font-black text-emerald-600 text-sm block">+{log.totalAmount} ฿</span>
+                                      <span className="text-[10px] text-slate-500">{log.cups} แก้ว @ {log.pricePerCup}฿</span>
+                                    </div>
+                                    <button onClick={() => handleDeleteSale(log.id)} className="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg">
+                                      <i data-lucide="trash-2" className="w-4 h-4"></i>
+                                    </button>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {/* TAB 1: สั่งปรุงน้ำปรุง */}
                   {activeTab === 'production' && (
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -2111,7 +2452,7 @@
                     </div>
                   )}
 
-                  {/* TAB 2: คลังวัตถุดิบ (ปรับเป็น Grid 2 ช่องในโทรศัพท์มือถือ) */}
+                  {/* TAB 2: คลังวัตถุดิบ */}
                   {activeTab === 'stock' && (
                     <div className="bg-white rounded-3xl p-3.5 sm:p-8 border border-slate-200/80 custom-shadow">
                       
@@ -2525,7 +2866,7 @@
 
           {/* Footer */}
           <footer className="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-400 mt-8">
-            <p>© {new Date().getFullYear()} ระบบสต๊อกร้านติดใจ (Mobile Edition)</p>
+            <p>© {new Date().getFullYear()} ระบบสต๊อก & ยอดขายร้านติดใจ (Mobile Edition)</p>
           </footer>
 
           {/* ALL MODALS */}
