@@ -114,13 +114,13 @@
 
     // --- Firebase Configuration ---
     const firebaseConfig = {
-      apiKey: "AIzaSyD3wBGAwKShNdgQ9koIOc012Rr7G3PThaQ",
-      authDomain: "mystock-9c662.firebaseapp.com",
-      projectId: "mystock-9c662",
-      storageBucket: "mystock-9c662.firebasestorage.app",
-      messagingSenderId: "260845867642",
-      appId: "1:260845867642:web:838b08a93178e8d2eae1c3",
-      measurementId: "G-J37RQGYDT2"
+      apiKey: "AIzaSyDCwQ4AIxY5haYIj-Kd-nGNAq_Jn1t_aLk",
+      authDomain: "chanomstock.firebaseapp.com",
+      projectId: "chanomstock",
+      storageBucket: "chanomstock.firebasestorage.app",
+      messagingSenderId: "309865099169",
+      appId: "1:309865099169:web:d5df7c674180ab845865e0",
+      measurementId: "G-Y6HGEXEQWY"
     };
 
     if (!firebase.apps.length) {
