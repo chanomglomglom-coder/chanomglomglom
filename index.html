@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>ระบบสต๊อก & ยอดขาย ร้านติดใจ (Boba Milk Tea Edition)</title>
-  <meta property="og:title" content="ระบบสต๊อก & ยอดขาย ร้านติดใจ" />
-  <meta property="og:description" content="ระบบจัดการสต๊อก คำนวณการปรุง และสรุปยอดขายแบบครบวงจร" />
+  <title>ระบบสต๊อก & ยอดขาย - ชานมกลมกล่อม</title>
+  <meta property="og:title" content="ระบบสต๊อก & ยอดขาย - ชานมกลมกล่อม" />
+  <meta property="og:description" content="ระบบจัดการสต๊อก คำนวณการปรุง และสรุปยอดขายชานมกลมกล่อม" />
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -27,8 +27,8 @@
     /* Boba Milk Tea Color Palette */
     body { 
       font-family: 'Prompt', sans-serif; 
-      background-color: #f7f3ee; /* ครีมนมสด */
-      color: #3d2b1f; /* น้ำตาลเข้มไข่มุก */
+      background-color: #f7f3ee;
+      color: #3d2b1f; 
       -webkit-tap-highlight-color: transparent; 
     }
 
@@ -51,7 +51,6 @@
 
     input, select, button { touch-action: manipulation; }
 
-    /* ปุ่มสไตล์แคปซูล (Pill Buttons) */
     .btn-pill {
       display: inline-flex;
       align-items: center;
@@ -69,19 +68,12 @@
     }
     .btn-boba:hover { background-color: #6f442b; }
 
-    .btn-tea {
-      background-color: #c08552;
-      box-shadow: 0 4px 14px rgba(192, 133, 82, 0.3);
-    }
-    .btn-tea:hover { background-color: #a66f3f; }
-
     .btn-dark-boba {
       background-color: #2b1e16;
       box-shadow: 0 4px 14px rgba(43, 30, 22, 0.3);
     }
     .btn-dark-boba:hover { background-color: #1a120d; }
 
-    /* A4 Simulation Style */
     .a4-container {
       width: 100%;
       max-width: 210mm;
@@ -117,9 +109,8 @@
   <script type="text/babel">
     const { useState, useEffect, useMemo } = React;
 
-    const MASTER_PASSWORD = "Phon1234"; // รหัสผ่านหลักระบบ
+    const MASTER_PASSWORD = "Phon1234";
 
-    // --- Firebase Configuration ---
     const firebaseConfig = {
       apiKey: "AIzaSyDCwQ4AIxY5haYIj-Kd-nGNAq_Jn1t_aLk",
       authDomain: "chanomstock.firebaseapp.com",
@@ -154,9 +145,7 @@
       return amount;
     };
 
-    // ==========================================
-    // MODAL: จัดการหมวดหมู่ (Category Management)
-    // ==========================================
+    // MODAL: จัดการหมวดหมู่
     function CategoryModal({ isOpen, onClose, categories, onAddCategory, onDeleteCategory }) {
       const [newCatName, setNewCatName] = useState('');
 
@@ -221,9 +210,7 @@
       );
     }
 
-    // ==========================================
-    // MODAL: สรุปรายการวัตถุดิบคงเหลือแยกตามหมวดหมู่
-    // ==========================================
+    // MODAL: สรุปวัตถุดิบคงเหลือตามหมวดหมู่
     function StockSummaryByCategoryModal({ isOpen, onClose, stocks, categories }) {
       if (!isOpen) return null;
 
@@ -243,7 +230,7 @@
       const todayStr = new Date().toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' });
 
       const handleShare = async () => {
-        let text = `📦 สรุปวัตถุดิบคงเหลือร้านติดใจ (${todayStr})\n------------------------\n`;
+        let text = `📦 สรุปวัตถุดิบคงเหลือร้านชานมกลมกล่อม (${todayStr})\n------------------------\n`;
         categorizedStocks.forEach(group => {
           if (group.items.length > 0) {
             text += `\n🏷️ [${group.categoryName}]\n`;
@@ -272,7 +259,7 @@
                   <i data-lucide="clipboard-check" className="w-5 h-5 text-amber-700"></i>
                   สรุปสต๊อกตามหมวดหมู่
                 </h3>
-                <p className="text-[10px] text-stone-400">ร้านติดใจ | ประจำวันที่ {todayStr}</p>
+                <p className="text-[10px] text-stone-400">ร้านชานมกลมกล่อม | ประจำวันที่ {todayStr}</p>
               </div>
               <button onClick={onClose} className="p-1 rounded-lg text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition">
                 <i data-lucide="x" className="w-5 h-5"></i>
@@ -319,110 +306,7 @@
       );
     }
 
-    // ==========================================
-    // MODAL: แก้ไขรายการวัตถุดิบรายตัว (Movement Log)
-    // ==========================================
-    function EditMovementModal({ isOpen, onClose, movementLog, stocks, onSave }) {
-      const [itemsMap, setItemsMap] = useState({});
-      const [note, setNote] = useState('');
-
-      useEffect(() => {
-        if (movementLog) {
-          setNote(movementLog.note || '');
-          const initialMap = {};
-          
-          if (movementLog.rawRestock) {
-            Object.entries(movementLog.rawRestock).forEach(([id, val]) => { initialMap[id] = val; });
-          } else if (movementLog.rawDeductions) {
-            Object.entries(movementLog.rawDeductions).forEach(([id, val]) => { initialMap[id] = val; });
-          }
-          setItemsMap(initialMap);
-        }
-      }, [movementLog]);
-
-      if (!isOpen || !movementLog) return null;
-
-      const isRestock = movementLog.type === 'เติมสต๊อก';
-
-      const handleValChange = (stockId, val) => {
-        setItemsMap(prev => ({ ...prev, [stockId]: val }));
-      };
-
-      const handleSubmit = (e) => {
-        e.preventDefault();
-        onSave(movementLog, itemsMap, note);
-      };
-
-      return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-stone-100 max-h-[85vh] flex flex-col justify-between">
-            <div>
-              <div className="flex justify-between items-center pb-3 border-b border-stone-100 mb-4">
-                <div>
-                  <h3 className="font-bold text-base text-amber-900 flex items-center gap-2">
-                    <i data-lucide="edit-3" className="w-5 h-5 text-amber-700"></i>
-                    แก้ไขรายการวัตถุดิบ ({isRestock ? 'เติมของ' : 'เอาออก'})
-                  </h3>
-                  <p className="text-[11px] text-stone-400">ปรับแก้เฉพาะจำนวนของวัตถุดิบตัวที่บันทึกผิด</p>
-                </div>
-                <button onClick={onClose} className="p-1 rounded-lg text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition">
-                  <i data-lucide="x" className="w-5 h-5"></i>
-                </button>
-              </div>
-
-              <form id="editMovementForm" onSubmit={handleSubmit} className="space-y-3">
-                <div className="max-h-[45vh] overflow-y-auto pr-1 space-y-2">
-                  {Object.entries(itemsMap).map(([stockId, qty]) => {
-                    const stockItem = stocks.find(s => s.id === stockId);
-                    const stockName = stockItem ? stockItem.name : 'วัตถุดิบ';
-                    const stockUnit = stockItem ? stockItem.unit : '';
-
-                    return (
-                      <div key={stockId} className="bg-stone-50 border border-stone-200 p-3 rounded-2xl flex items-center justify-between gap-2">
-                        <span className="font-bold text-xs text-stone-800 truncate flex-1">{stockName}</span>
-                        <div className="flex items-center gap-1.5 w-32">
-                          <input
-                            type="number"
-                            step="any"
-                            value={qty}
-                            onChange={(e) => handleValChange(stockId, e.target.value)}
-                            className="w-full px-2.5 py-1.5 text-xs text-center font-bold text-amber-800 bg-white rounded-xl border border-stone-300 focus:outline-none"
-                          />
-                          <span className="text-[11px] text-stone-400">{stockUnit}</span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                <div className="pt-2">
-                  <label className="block text-xs font-semibold text-stone-600 mb-1">หมายเหตุ</label>
-                  <input
-                    type="text"
-                    value={note}
-                    onChange={(e) => setNote(e.target.value)}
-                    className="w-full px-3 py-2 text-xs rounded-xl custom-input"
-                  />
-                </div>
-              </form>
-            </div>
-
-            <div className="pt-3 border-t border-stone-100 flex gap-2 mt-4">
-              <button type="button" onClick={onClose} className="flex-1 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-600 font-bold text-xs rounded-xl transition">
-                ยกเลิก
-              </button>
-              <button type="submit" form="editMovementForm" className="flex-1 py-2.5 bg-amber-700 hover:bg-amber-800 text-white font-bold text-xs rounded-xl shadow-md transition">
-                บันทึกการแก้ไข
-              </button>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    // ==========================================
-    // MODAL: แก้ไขบันทึกการผลิต
-    // ==========================================
+    // MODAL: แก้ไขบันทึกการผลิต/ขาย
     function EditProductionLogModal({ isOpen, onClose, logToEdit, onSave }) {
       const [itemsMap, setItemsMap] = useState({});
       const [note, setNote] = useState('');
@@ -432,9 +316,9 @@
           setNote(logToEdit.note || '');
           const initialMap = {};
           if (logToEdit.title) {
-            const raw = logToEdit.title.replace(/^(ปรุง|สั่งปรุง|ต้ม)\s+/, '').split(', ');
+            const raw = logToEdit.title.replace(/^(สั่งปรุง\/ขาย|ปรุง|สั่งปรุง|ต้ม)\s+/, '').split(', ');
             raw.forEach(item => {
-              const match = item.match(/(.+) \((\d+) (ถัง|แก้ว|หม้อ)\)/);
+              const match = item.match(/(.+) \((\d+) (ถัง|แก้ว|หม้อ|หน่วย)\)/);
               if (match) {
                 const name = match[1].trim();
                 const count = parseInt(match[2], 10);
@@ -533,9 +417,7 @@
       );
     }
 
-    // ==========================================
-    // MODAL: เพิ่ม/แก้ไข วัตถุดิบ (Stock Modal)
-    // ==========================================
+    // MODAL: เพิ่ม/แก้ไข วัตถุดิบ
     function StockModal({ isOpen, onClose, onSave, editingStock, handleImageUpload, categories, onOpenCategoryModal }) {
       const [name, setName] = useState('');
       const [category, setCategory] = useState('');
@@ -650,9 +532,7 @@
       );
     }
 
-    // ==========================================
-    // MODAL: เติมวัตถุดิบเข้าคลัง (Restock Batch Modal)
-    // ==========================================
+    // MODAL: เติมวัตถุดิบเข้าคลัง
     function RestockModal({ isOpen, onClose, stocks, categories, onConfirmBatchRestock }) {
       const [restockQtyMap, setRestockQtyMap] = useState({});
       const [note, setNote] = useState('');
@@ -784,158 +664,9 @@
       );
     }
 
-    // ==========================================
-    // MODAL: เอาของออกไปหน้าร้าน (Transfer Batch Modal)
-    // ==========================================
-    function TransferModal({ isOpen, onClose, stocks, categories, onConfirmBatchTransfer }) {
-      const [transferQtyMap, setTransferQtyMap] = useState({});
-      const [note, setNote] = useState('');
-      const [selectedCategory, setSelectedCategory] = useState('all');
-
-      useEffect(() => {
-        if (isOpen) {
-          const initialMap = {};
-          stocks.forEach(s => { initialMap[s.id] = ''; });
-          setTransferQtyMap(initialMap);
-          setNote('');
-          setSelectedCategory('all');
-        }
-      }, [isOpen, stocks]);
-
-      if (!isOpen) return null;
-
-      const filteredStocks = stocks.filter(s => selectedCategory === 'all' || s.category === selectedCategory);
-
-      const handleQtyChange = (stockId, val) => {
-        setTransferQtyMap(prev => ({ ...prev, [stockId]: val }));
-      };
-
-      const handleSubmit = (e) => {
-        e.preventDefault();
-
-        for (const stockId in transferQtyMap) {
-          const qty = Number(transferQtyMap[stockId]);
-          if (qty > 0) {
-            const stockItem = stocks.find(s => s.id === stockId);
-            if (stockItem && qty > Number(stockItem.current)) {
-              return alert(`รายการ "${stockItem.name}" เอาออกเกินจำนวนคงเหลือที่มีในคลัง (มีอยู่ ${stockItem.current} ${stockItem.unit})`);
-            }
-          }
-        }
-
-        onConfirmBatchTransfer(transferQtyMap, note);
-      };
-
-      return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-stone-100 max-h-[90vh] flex flex-col justify-between">
-            <div>
-              <div className="flex justify-between items-center pb-4 border-b border-stone-100 mb-3">
-                <div>
-                  <h3 className="font-bold text-lg text-amber-900 flex items-center gap-2">
-                    <i data-lucide="upload" className="w-5 h-5 text-amber-700"></i>
-                    📤 เอาของออกไปหน้าร้าน (Transfer Batch)
-                  </h3>
-                  <p className="text-xs text-stone-400 mt-0.5">ใส่จำนวนที่ต้องการเอาออกลงในช่องของแต่ละวัตถุดิบ</p>
-                </div>
-                <button onClick={onClose} className="p-1 rounded-lg text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition">
-                  <i data-lucide="x" className="w-5 h-5"></i>
-                </button>
-              </div>
-
-              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-3 mb-2 border-b border-stone-100">
-                <button
-                  type="button"
-                  onClick={() => setSelectedCategory('all')}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
-                    selectedCategory === 'all'
-                      ? 'bg-amber-700 text-white shadow-md'
-                      : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
-                  }`}
-                >
-                  ทั้งหมด
-                </button>
-                {categories.map((cat) => (
-                  <button
-                    key={cat.id}
-                    type="button"
-                    onClick={() => setSelectedCategory(cat.name)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
-                      selectedCategory === cat.name
-                        ? 'bg-amber-700 text-white shadow-md'
-                        : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
-                    }`}
-                  >
-                    {cat.name}
-                  </button>
-                ))}
-              </div>
-
-              <form id="transferForm" onSubmit={handleSubmit} className="space-y-4">
-                <div className="max-h-[45vh] overflow-y-auto pr-1 space-y-3">
-                  {filteredStocks.map(stock => {
-                    const isLow = Number(stock.current) <= Number(stock.minAlert || 0);
-                    return (
-                      <div key={stock.id} className={`p-3.5 rounded-2xl border flex items-center justify-between gap-3 ${isLow ? 'bg-rose-50/50 border-rose-200' : 'bg-amber-50/20 border-amber-200/50'}`}>
-                        <div className="flex-1 min-w-0 flex items-center gap-3">
-                          <img src={stock.image || DEFAULT_IMAGE} className="w-10 h-10 rounded-lg object-cover border" alt={stock.name} />
-                          <div>
-                            <div className="flex items-center space-x-2">
-                              <span className="font-bold text-sm text-amber-950 truncate">{stock.name}</span>
-                              {isLow && <span className="text-[10px] bg-rose-100 text-rose-600 px-2 py-0.5 rounded font-bold">ใกล้หมด</span>}
-                            </div>
-                            <span className="text-xs text-stone-400">ปัจจุบัน: <strong className="text-stone-700">{stock.current}</strong> {stock.unit}</span>
-                          </div>
-                        </div>
-                        <div className="w-36 flex items-center space-x-1.5">
-                          <span className="text-xs font-bold text-amber-700">-</span>
-                          <input
-                            type="number"
-                            step="any"
-                            placeholder="0"
-                            value={transferQtyMap[stock.id] || ''}
-                            onChange={(e) => handleQtyChange(stock.id, e.target.value)}
-                            className="w-full px-3 py-2 text-sm text-center font-bold text-amber-800 bg-white rounded-xl border border-stone-300 focus:border-amber-700 focus:outline-none"
-                          />
-                          <span className="text-xs text-stone-400 whitespace-nowrap min-w-[30px]">{stock.unit}</span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                  {filteredStocks.length === 0 && (
-                    <div className="text-center py-8 text-stone-400 text-xs italic">ไม่พบวัตถุดิบในหมวดหมู่นี้</div>
-                  )}
-                </div>
-
-                <div className="pt-2">
-                  <label className="block text-xs font-semibold text-stone-600 mb-1">หมายเหตุการเอาวัตถุดิบออก / ชื่อผู้เบิก</label>
-                  <input
-                    type="text"
-                    placeholder="เช่น เบิกเอาของออกไปหน้าร้าน..."
-                    value={note}
-                    onChange={(e) => setNote(e.target.value)}
-                    className="w-full px-4 py-2.5 text-sm rounded-xl custom-input"
-                  />
-                </div>
-              </form>
-            </div>
-
-            <div className="pt-4 border-t border-stone-100 flex gap-3 mt-4">
-              <button type="button" onClick={onClose} className="flex-1 py-3 bg-stone-100 hover:bg-stone-200 text-stone-600 font-bold text-sm rounded-xl transition">ยกเลิก</button>
-              <button type="submit" form="transferForm" className="flex-1 py-3 bg-amber-700 hover:bg-amber-800 text-white font-bold text-sm rounded-xl shadow-lg shadow-amber-700/20 transition">บันทึกการเอาของออก</button>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    // ==========================================
     // MODAL: ยืนยันการลบประวัติ
-    // ==========================================
     function DeleteLogModal({ isOpen, onClose, logToDelete, onConfirmDelete }) {
       if (!isOpen || !logToDelete) return null;
-
-      const isRestock = logToDelete.type === 'เติมสต๊อก';
 
       return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-sm animate-fade-in">
@@ -944,13 +675,14 @@
               <i data-lucide="alert-circle" className="w-6 h-6"></i>
             </div>
             <h3 className="font-bold text-base text-stone-800 mb-1">ยืนยันการลบประวัติรายการ</h3>
-            <p className="text-xs text-stone-500 mb-4 font-medium">"{logToDelete.title}"</p>
+            <p className="text-xs text-stone-500 mb-2 font-medium">"{logToDelete.title}"</p>
+            <p className="text-xs text-rose-600 font-bold mb-4">⚠️ การลบรายการนี้จะทำการลบยอดขายของออเดอร์นี้ออกจากระบบด้วย</p>
 
             <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3 text-left mb-5">
               <p className="text-xs text-amber-900 font-semibold mb-1">คุณต้องการปรับคืนค่าสต๊อกวัตถุดิบเดิมหรือไม่?</p>
               <p className="text-[11px] text-amber-800/80">
-                • <b>คืนค่าสต๊อก:</b> {isRestock ? 'หักวัตถุดิบที่เคยเติมใส่ออกไปจากคลัง' : 'ดึงวัตถุดิบที่ถูกตัดไปคืนกลับเข้าคลังสต๊อก'}<br/>
-                • <b>ไม่คืนค่าสต๊อก:</b> ลบเฉพาะประวัติข้อความออกเพียงอย่างเดียว
+                • <b>คืนค่าสต๊อก:</b> ดึงวัตถุดิบที่ถูกตัดไปคืนกลับเข้าคลังสต๊อก + ลบยอดขาย<br/>
+                • <b>ไม่คืนค่าสต๊อก:</b> ลบประวัติและยอดขายออกเฉยๆ (ไม่คืนสต๊อก)
               </p>
             </div>
 
@@ -960,14 +692,14 @@
                 onClick={() => onConfirmDelete(true)}
                 className="w-full py-3 bg-amber-800 hover:bg-amber-900 text-white font-bold text-xs sm:text-sm rounded-xl transition shadow-md"
               >
-                🔄 คืนค่าสต๊อกเดิม & ลบประวัติ
+                🔄 คืนค่าสต๊อกเดิม & ลบยอดขาย/ประวัติ
               </button>
               <button
                 type="button"
                 onClick={() => onConfirmDelete(false)}
                 className="w-full py-3 bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs sm:text-sm rounded-xl transition shadow-md"
               >
-                🗑️ ลบประวัติเฉยๆ (ไม่คืนค่าสต๊อก)
+                🗑️ ลบเฉพาะยอดขาย & ประวัติ (ไม่คืนสต๊อก)
               </button>
               <button
                 type="button"
@@ -982,9 +714,7 @@
       );
     }
 
-    // ==========================================
     // MODAL: สรุปรายงานประจำวัน (A4)
-    // ==========================================
     function PrintSummaryModal({ isOpen, onClose, logs, lowStockItems }) {
       if (!isOpen) return null;
 
@@ -1007,7 +737,7 @@
         if (l.title) {
           const items = l.title.replace(/^(สั่งปรุง\/ขาย|ปรุง|ต้ม)\s+/, '').split(', ');
           items.forEach(item => {
-            const match = item.match(/(.+) \((\d+) (ถัง|แก้ว|หม้อ)\)/);
+            const match = item.match(/(.+) \((\d+) (ถัง|แก้ว|หม้อ|หน่วย)\)/);
             if (match) {
               const name = match[1].trim();
               const count = parseInt(match[2], 10);
@@ -1017,8 +747,6 @@
           });
         }
       });
-
-      const transferLogs = todayLogs.filter(l => l.type === 'เอาของออกไปหน้าร้าน' || l.type === 'ย้ายไปหน้าร้าน');
 
       const handlePrint = () => { window.print(); };
 
@@ -1031,7 +759,7 @@
                 <div className="border-b-2 border-stone-900 pb-3 mb-4 flex justify-between items-end">
                   <div>
                     <h1 className="text-base sm:text-2xl font-black text-amber-950 tracking-tight">📄 รายงานสรุปประจำวัน</h1>
-                    <p className="text-[11px] sm:text-xs font-semibold text-stone-600 mt-0.5">ร้านติดใจ | วันที่: {todayStr}</p>
+                    <p className="text-[11px] sm:text-xs font-semibold text-stone-600 mt-0.5">ชานมกลมกล่อม | วันที่: {todayStr}</p>
                   </div>
                   <div className="text-right text-[10px] sm:text-xs text-stone-400 font-mono">
                     DAILY-REPORT
@@ -1082,25 +810,6 @@
                     </div>
                   )}
                 </div>
-
-                <div className="mb-2 bg-stone-50/80 p-3 sm:p-4 rounded-xl border border-stone-200">
-                  <h3 className="font-bold text-stone-800 text-xs sm:text-sm mb-2 flex items-center gap-1.5">
-                    📤 สรุปการเอาของออกไปหน้าร้านวันนี้
-                  </h3>
-
-                  {transferLogs.length === 0 ? (
-                    <div className="text-[11px] text-stone-500 italic">ไม่มีรายการเอาของออกไปหน้าร้านในวันนี้</div>
-                  ) : (
-                    <div className="space-y-1.5 text-[11px] sm:text-xs">
-                      {transferLogs.map(l => (
-                        <div key={l.id} className="bg-white px-2.5 py-1.5 rounded-lg border border-stone-200 flex justify-between items-center">
-                          <span className="font-medium text-stone-800 truncate">{l.title}</span>
-                          <span className="text-stone-400 text-[9px] sm:text-[10px] ml-2 whitespace-nowrap">{l.datetime}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
               </div>
 
               <div className="pt-6 mt-6 border-t border-stone-200 grid grid-cols-2 text-center text-[10px] text-stone-400">
@@ -1123,13 +832,11 @@
       );
     }
 
-    // ==========================================
-    // MODAL: เพิ่ม/แก้ไข สูตรเครื่องดื่ม/น้ำปรุง (BOM Modal)
-    // ==========================================
+    // MODAL: เพิ่ม/แก้ไข สูตร BOM
     function RecipeModal({ isOpen, onClose, onSave, editingRecipe, stocks, handleImageUpload }) {
       const [name, setName] = useState('');
       const [yieldInfo, setYieldInfo] = useState('1 ถัง');
-      const [price, setPrice] = useState(35); // เพิ่มราคาขาย
+      const [price, setPrice] = useState(35);
       const [image, setImage] = useState('');
       const [ingredients, setIngredients] = useState([]);
 
@@ -1306,11 +1013,9 @@
       );
     }
 
-    // ==========================================
     // MAIN APP COMPONENT
-    // ==========================================
     function App() {
-      const [activeTab, setActiveTab] = useState('production'); // หน้าหลักเปลี่ยนเป็น 'สั่งปรุง/ขาย'
+      const [activeTab, setActiveTab] = useState('production');
       const [isBomUnlocked, setIsBomUnlocked] = useState(false);
 
       const [stocks, setStocks] = useState([]);
@@ -1326,7 +1031,15 @@
       const [selectedCategory, setSelectedCategory] = useState('all');
       const [searchRecipe, setSearchRecipe] = useState('');
       const [searchHistory, setSearchHistory] = useState('');
-      const [searchMovement, setSearchMovement] = useState('');
+
+      // Daily Sales Filter Date State (ดูย้อนหลังได้)
+      const [selectedDailyDate, setSelectedDailyDate] = useState(() => {
+        const d = new Date();
+        const year = d.getFullYear();
+        const month = (d.getMonth() + 1).toString().padStart(2, '0');
+        const day = d.getDate().toString().padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      });
 
       // Month Filter State for Sales Summary
       const [selectedMonth, setSelectedMonth] = useState(() => {
@@ -1345,7 +1058,6 @@
       const [editingStock, setEditingStock] = useState(null);
 
       const [restockModalOpen, setRestockModalOpen] = useState(false);
-      const [transferModalOpen, setTransferModalOpen] = useState(false);
       const [printModalOpen, setPrintModalOpen] = useState(false);
 
       const [recipeModalOpen, setRecipeModalOpen] = useState(false);
@@ -1354,18 +1066,14 @@
       const [categoryModalOpen, setCategoryModalOpen] = useState(false);
       const [stockCategorySummaryModalOpen, setStockCategorySummaryModalOpen] = useState(false);
 
-      // Edit Movement & Production Log States
-      const [movementToEdit, setMovementToEdit] = useState(null);
       const [productionToEdit, setProductionToEdit] = useState(null);
-
-      // Delete Log State
       const [logToDelete, setLogToDelete] = useState(null);
 
       useEffect(() => {
         if (window.lucide) window.lucide.createIcons();
       });
 
-      // --- Firebase Listener ---
+      // Firebase Listener
       useEffect(() => {
         const unsubCategories = db.collection('categories').onSnapshot(snapshot => {
           const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -1443,7 +1151,7 @@
         }
       };
 
-      // --- Sales Calculations ---
+      // Sales Calculations
       const todayISO = useMemo(() => {
         const d = new Date();
         const year = d.getFullYear();
@@ -1452,11 +1160,19 @@
         return `${year}-${month}-${day}`;
       }, []);
 
+      // คำนวณสรุปยอดขายตามวันที่เลือก (ดูย้อนหลังได้)
+      const selectedDailySalesSummary = useMemo(() => {
+        const targetLogs = salesLogs.filter(s => s.dateISO === selectedDailyDate);
+        const totalMoney = targetLogs.reduce((acc, curr) => acc + (curr.totalAmount || 0), 0);
+        const totalCups = targetLogs.reduce((acc, curr) => acc + (curr.cups || 0), 0);
+        return { totalMoney, totalCups, count: targetLogs.length, logs: targetLogs };
+      }, [salesLogs, selectedDailyDate]);
+
+      // สรุปยอดขายวันนี้สำหรับแสดงบน Header
       const todaySalesSummary = useMemo(() => {
         const todayLogs = salesLogs.filter(s => s.dateISO === todayISO);
         const totalMoney = todayLogs.reduce((acc, curr) => acc + (curr.totalAmount || 0), 0);
-        const totalCups = todayLogs.reduce((acc, curr) => acc + (curr.cups || 0), 0);
-        return { totalMoney, totalCups, count: todayLogs.length };
+        return { totalMoney };
       }, [salesLogs, todayISO]);
 
       const monthSalesSummary = useMemo(() => {
@@ -1523,16 +1239,6 @@
         );
       }, [logs, searchHistory]);
 
-      const filteredMovements = useMemo(() => {
-        const movementLogs = logs.filter(l => l.type === 'เติมสต๊อก' || l.type === 'เอาของออกไปหน้าร้าน' || l.type === 'ย้ายไปหน้าร้าน');
-        return movementLogs.filter(l =>
-          (l.title && l.title.toLowerCase().includes(searchMovement.toLowerCase())) ||
-          (l.datetime && l.datetime.toLowerCase().includes(searchMovement.toLowerCase())) ||
-          (l.note && l.note.toLowerCase().includes(searchMovement.toLowerCase())) ||
-          (Array.isArray(l.details) && l.details.some(d => d.toLowerCase().includes(searchMovement.toLowerCase())))
-        );
-      }, [logs, searchMovement]);
-
       const lowStockItems = useMemo(() => {
         return stocks.filter(item => {
           const currentVal = Number(item.current) || 0;
@@ -1554,7 +1260,7 @@
         }
       };
 
-      // --- Production & Instant Checkout Handlers ---
+      // Production & Instant Checkout Handlers
       const handleQuantityChange = (recipeId, delta) => {
         setBatchQuantities(prev => {
           const current = prev[recipeId] || 0;
@@ -1594,15 +1300,11 @@
           });
       }, [batchQuantities, recipes]);
 
-      const totalBucketsCount = useMemo(() => {
-        return selectedProductionList.reduce((acc, curr) => acc + curr.qty, 0);
-      }, [selectedProductionList]);
-
       const grandTotalPrice = useMemo(() => {
         return selectedProductionList.reduce((acc, curr) => acc + curr.totalPrice, 0);
       }, [selectedProductionList]);
 
-      // ฟังก์ชันควบรวม: ยืนยันการปรุง + คิดเงิน + ตัดสต๊อก + บันทึกยอดขาย
+      // ยืนยันการปรุง + คิดเงิน + ตัดสต๊อก + บันทึกยอดขาย (ผูก logId ใน sales)
       const handleConfirmProductionAndCheckout = async () => {
         if (selectedProductionList.length === 0) return alert('กรุณาเลือกรายการปรุง/เครื่องดื่มอย่างน้อย 1 รายการ');
 
@@ -1610,7 +1312,6 @@
           const batch = db.batch();
           const deductionsSummary = {};
 
-          // 1. คำนวณตัดสต๊อกวัตถุดิบ
           selectedProductionList.forEach(item => {
             if (item.recipe && item.recipe.ingredients) {
               item.recipe.ingredients.forEach(ing => {
@@ -1624,7 +1325,6 @@
             }
           });
 
-          // 2. ตัดสต๊อกวัตถุดิบในคลัง
           Object.entries(deductionsSummary).forEach(([stockId, deductAmount]) => {
             const stockRef = db.collection('stocks').doc(stockId);
             batch.update(stockRef, {
@@ -1649,8 +1349,9 @@
           const timeStr = `${day}/${month}/${yearTH} ${hours}:${mins} น.`;
           const dateISO = `${year}-${month}-${day}`;
 
-          // 3. บันทึกประวัติลง Logs
           const logRef = db.collection('logs').doc();
+          const newLogId = logRef.id;
+
           batch.set(logRef, {
             datetime: timeStr,
             timestamp: firebase.firestore.FieldValue.serverTimestamp(),
@@ -1662,10 +1363,10 @@
             note: productionNote || 'สั่งปรุงและคิดเงินหน้าร้าน'
           });
 
-          // 4. บันทึกลงระบบยอดขาย (Sales Collection) แยกทีละรายการ
           selectedProductionList.forEach(item => {
             const saleRef = db.collection('sales').doc();
             batch.set(saleRef, {
+              logId: newLogId, // ผูก ID เพื่อใช้ลบพร้อมกันได้
               recipeId: item.recipeId,
               menuName: item.name,
               cups: Number(item.qty),
@@ -1689,59 +1390,6 @@
         }
       };
 
-      // --- Movement Edit Handler ---
-      const handleSaveMovementEdit = async (logItem, updatedItemsMap, newNote) => {
-        try {
-          const batch = db.batch();
-          const isRestock = logItem.type === 'เติมสต๊อก';
-          const oldMap = isRestock ? logItem.rawRestock : logItem.rawDeductions;
-
-          if (oldMap) {
-            Object.entries(oldMap).forEach(([sId, oldQty]) => {
-              const stockRef = db.collection('stocks').doc(sId);
-              batch.update(stockRef, {
-                current: firebase.firestore.FieldValue.increment(isRestock ? -Number(oldQty) : Number(oldQty))
-              });
-            });
-          }
-
-          const newDetailsList = [];
-          const newRaw = {};
-
-          Object.entries(updatedItemsMap).forEach(([sId, newQtyStr]) => {
-            const newQty = Number(newQtyStr) || 0;
-            if (newQty > 0) {
-              const stockRef = db.collection('stocks').doc(sId);
-              const stockItem = stocks.find(s => s.id === sId);
-              batch.update(stockRef, {
-                current: firebase.firestore.FieldValue.increment(isRestock ? newQty : -newQty)
-              });
-              newDetailsList.push(`${stockItem ? stockItem.name : 'วัตถุดิบ'}: ${isRestock ? '+' : '-'}${newQty} ${stockItem ? stockItem.unit : ''}`);
-              newRaw[sId] = newQty;
-            }
-          });
-
-          const logRef = db.collection('logs').doc(logItem.id);
-          const updatePayload = {
-            details: newDetailsList,
-            note: newNote,
-            title: isRestock ? `เติมวัตถุดิบเข้าคลัง (${Object.keys(newRaw).length} รายการ)` : `เอาของออกไปหน้าร้าน (${Object.keys(newRaw).length} รายการ)`
-          };
-
-          if (isRestock) updatePayload.rawRestock = newRaw;
-          else updatePayload.rawDeductions = newRaw;
-
-          batch.update(logRef, updatePayload);
-
-          await batch.commit();
-          setMovementToEdit(null);
-          alert('แก้ไขบันทึกวัตถุดิบและปรับยอดสต๊อกเรียบร้อยแล้ว!');
-        } catch (e) {
-          console.error(e);
-          alert('เกิดข้อผิดพลาดในการแก้ไขข้อมูล');
-        }
-      };
-
       const handleSaveProductionEdit = async (logItem, updatedItemsMap, newNote) => {
         try {
           const titleText = Object.entries(updatedItemsMap)
@@ -1755,46 +1403,43 @@
           });
 
           setProductionToEdit(null);
-          alert('แก้ไขบันทึกการผลิตเรียบร้อยแล้ว!');
+          alert('แก้ไขบันทึกเรียบร้อยแล้ว!');
         } catch (e) {
           console.error(e);
           alert('เกิดข้อผิดพลาดในการแก้ไข');
         }
       };
 
+      // ลบประวัติสั่งปรุง/ขาย พร้อมลบยอดขายที่เกี่ยวข้องออกด้วยอัตโนมัติ
       const handleConfirmDeleteLog = async (shouldRestore) => {
         if (!logToDelete) return;
 
         try {
           const batch = db.batch();
 
-          if (shouldRestore) {
-            if (logToDelete.type === 'เติมสต๊อก') {
-              if (logToDelete.rawRestock) {
-                Object.entries(logToDelete.rawRestock).forEach(([sId, amount]) => {
-                  const stockRef = db.collection('stocks').doc(sId);
-                  batch.update(stockRef, {
-                    current: firebase.firestore.FieldValue.increment(-Number(amount))
-                  });
-                });
-              }
-            } else {
-              if (logToDelete.rawDeductions) {
-                Object.entries(logToDelete.rawDeductions).forEach(([sId, amount]) => {
-                  const stockRef = db.collection('stocks').doc(sId);
-                  batch.update(stockRef, {
-                    current: firebase.firestore.FieldValue.increment(Number(amount))
-                  });
-                });
-              }
-            }
+          // 1. ถ้าเลือกคืนค่าสต๊อก
+          if (shouldRestore && logToDelete.rawDeductions) {
+            Object.entries(logToDelete.rawDeductions).forEach(([sId, amount]) => {
+              const stockRef = db.collection('stocks').doc(sId);
+              batch.update(stockRef, {
+                current: firebase.firestore.FieldValue.increment(Number(amount))
+              });
+            });
           }
 
+          // 2. ค้นหาและลบยอดขายใน collection sales ที่ผูกกับ log นี้
+          const relatedSales = salesLogs.filter(s => s.logId === logToDelete.id);
+          relatedSales.forEach(s => {
+            const saleRef = db.collection('sales').doc(s.id);
+            batch.delete(saleRef);
+          });
+
+          // 3. ลบเอกสาร Log
           const logRef = db.collection('logs').doc(logToDelete.id);
           batch.delete(logRef);
 
           await batch.commit();
-          alert(shouldRestore ? 'ลบประวัติพร้อมคืนค่าสต๊อกเดิมเรียบร้อยแล้ว!' : 'ลบรายการประวัติเรียบร้อยแล้ว!');
+          alert('ลบประวัติพร้อมปรับลบยอดขายและสต๊อกเรียบร้อยแล้ว!');
           setLogToDelete(null);
         } catch (e) {
           console.error(e);
@@ -1802,7 +1447,7 @@
         }
       };
 
-      // --- Stock Handlers ---
+      // Stock Handlers
       const handleDeleteStock = async (id) => {
         if (confirm('คุณต้องการลบวัตถุดิบรายการนี้ใช่หรือไม่?')) {
           await db.collection('stocks').doc(id).delete();
@@ -1827,7 +1472,6 @@
         }
       };
 
-      // --- Restock Handlers ---
       const handleBatchRestock = async (restockItemsMap, globalNote) => {
         try {
           const itemsToProcess = Object.entries(restockItemsMap).filter(([_, qty]) => Number(qty) > 0);
@@ -1878,58 +1522,7 @@
         }
       };
 
-      // --- Transfer Batch Handler ---
-      const handleBatchTransfer = async (transferItemsMap, globalNote) => {
-        try {
-          const itemsToProcess = Object.entries(transferItemsMap).filter(([_, qty]) => Number(qty) > 0);
-          if (itemsToProcess.length === 0) return alert('กรุณาระบุจำนวนวัตถุดิบที่ต้องการเอาออกอย่างน้อย 1 รายการ');
-
-          const batch = db.batch();
-          const detailsList = [];
-          const rawDeductions = {};
-
-          itemsToProcess.forEach(([stockId, qty]) => {
-            const stockItem = stocks.find(s => s.id === stockId);
-            const amount = Number(qty);
-            if (stockItem && amount > 0) {
-              const stockRef = db.collection('stocks').doc(stockId);
-              batch.update(stockRef, {
-                current: firebase.firestore.FieldValue.increment(-amount)
-              });
-              detailsList.push(`${stockItem.name}: -${amount} ${stockItem.unit}`);
-              rawDeductions[stockId] = amount;
-            }
-          });
-
-          const now = new Date();
-          const day = now.getDate().toString().padStart(2, '0');
-          const month = (now.getMonth() + 1).toString().padStart(2, '0');
-          const year = now.getFullYear() + 543;
-          const hours = now.getHours().toString().padStart(2, '0');
-          const mins = now.getMinutes().toString().padStart(2, '0');
-          const timeStr = `${day}/${month}/${year} ${hours}:${mins} น.`;
-
-          const logRef = db.collection('logs').doc();
-          batch.set(logRef, {
-            datetime: timeStr,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-            type: 'เอาของออกไปหน้าร้าน',
-            title: `เอาของออกไปหน้าร้าน (${itemsToProcess.length} รายการ)`,
-            details: detailsList,
-            rawDeductions: rawDeductions,
-            note: globalNote || 'เอาของออกไปหน้าร้าน'
-          });
-
-          await batch.commit();
-          setTransferModalOpen(false);
-          alert(`เอาของออกไปหน้าร้านเรียบร้อยแล้วทั้งหมด ${itemsToProcess.length} รายการ!`);
-        } catch (err) {
-          console.error("Batch Transfer error:", err);
-          alert("เกิดข้อผิดพลาดในการเอาของออกไปหน้าร้าน");
-        }
-      };
-
-      // --- BOM Handlers ---
+      // BOM Handlers
       const handleDeleteRecipe = async (id) => {
         if (confirm('คุณต้องการลบสูตรวัตถุดิบนี้ใช่หรือไม่?')) {
           await db.collection('recipes').doc(id).delete();
@@ -1957,7 +1550,7 @@
       return (
         <div className="min-h-screen flex flex-col justify-between">
           <div>
-            {/* Header - โทนชาไต้หวัน / ชานม */}
+            {/* Header */}
             <header className="bg-white border-b border-amber-200/60 sticky top-0 z-40 shadow-sm">
               <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between border-b border-stone-100 sm:border-none">
                 <div className="flex items-center space-x-2.5">
@@ -1965,8 +1558,8 @@
                     <i data-lucide="cup-soda" className="w-5 h-5 sm:w-6 sm:h-6"></i>
                   </div>
                   <div>
-                    <h1 className="font-bold text-amber-950 text-base sm:text-lg tracking-tight leading-none">ร้านติดใจ</h1>
-                    <p className="text-[10px] text-amber-800/70 font-semibold mt-0.5">ระบบจัดการสั่งปรุง & สต๊อกชาไข่มุก</p>
+                    <h1 className="font-bold text-amber-950 text-base sm:text-lg tracking-tight leading-none">ชานมกลมกล่อม</h1>
+                    <p className="text-[10px] text-amber-800/70 font-semibold mt-0.5">ระบบสั่งปรุง สต๊อก & สรุปยอดขาย</p>
                   </div>
                 </div>
 
@@ -2019,11 +1612,6 @@
                     <i data-lucide="history" className="w-4 h-4"></i>
                     <span>📜 ประวัติสั่งปรุง/ขาย</span>
                   </button>
-
-                  <button onClick={() => handleTabChange('movements')} className={`flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'movements' ? 'bg-amber-800 text-white shadow-sm' : 'text-stone-600 hover:text-amber-950'}`}>
-                    <i data-lucide="arrow-left-right" className="w-4 h-4"></i>
-                    <span>🔄 วัตถุดิบ เข้า-ออก</span>
-                  </button>
                 </div>
               </div>
             </header>
@@ -2032,10 +1620,10 @@
             <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 my-4 sm:my-6">
 
               {loading ? (
-                <div className="text-center py-20 text-amber-900 font-medium text-sm">กำลังโหลดข้อมูลระบบชาไข่มุก...</div>
+                <div className="text-center py-20 text-amber-900 font-medium text-sm">กำลังโหลดข้อมูลชานมกลมกล่อม...</div>
               ) : (
                 <>
-                  {/* TAB 1: สั่งปรุง & คิดเงินในตัวเดียว (หน้าหลัก) */}
+                  {/* TAB 1: สั่งปรุง & คิดเงิน */}
                   {activeTab === 'production' && (
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                       <div className="lg:col-span-7 bg-white rounded-3xl p-4 sm:p-8 border border-amber-200/60 custom-shadow">
@@ -2115,7 +1703,7 @@
                         </div>
                       </div>
 
-                      {/* สรุปตะกร้าคิดเงิน */}
+                      {/* สรุปตระกร้าคิดเงิน */}
                       <div className="lg:col-span-5">
                         <div className="bg-[#2b1e16] text-white rounded-3xl p-5 sm:p-8 shadow-2xl sticky top-28 border border-amber-900/40">
                           <div className="flex items-center justify-between pb-4 border-b border-amber-900/60 mb-4 sm:mb-6">
@@ -2205,43 +1793,91 @@
                     </div>
                   )}
 
-                  {/* TAB 2: สรุปยอดขาย (Sales Summary) */}
+                  {/* TAB 2: สรุปยอดขาย (ดูย้อนหลังได้ทั้งรายวันและรายเดือน) */}
                   {activeTab === 'salesSummary' && (
                     <div className="space-y-6">
+                      {/* สรุปรายวัน - เลือกวันที่ย้อนหลังได้ */}
                       <div className="bg-white rounded-3xl p-5 sm:p-8 border border-amber-200/60 custom-shadow">
-                        <div className="flex justify-between items-center pb-4 border-b border-stone-100 mb-4">
+                        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 pb-4 border-b border-stone-100 mb-4">
                           <div>
                             <h2 className="text-lg font-bold text-amber-950 flex items-center gap-2">
-                              <span>📅</span> สรุปยอดขายวันนี้ (รายวัน)
+                              <span>📅</span> สรุปยอดขายรายวัน (เลือกดูย้อนหลัง)
                             </h2>
-                            <p className="text-xs text-stone-400 mt-0.5">ประจำวันที่ {new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                            <p className="text-xs text-stone-400 mt-0.5">เลือกระบุวันที่เพื่อดูสถิติการขายและออเดอร์ในวันนั้นๆ</p>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold text-amber-900 whitespace-nowrap">วันที่:</span>
+                            <input
+                              type="date"
+                              value={selectedDailyDate}
+                              onChange={(e) => setSelectedDailyDate(e.target.value)}
+                              className="px-3.5 py-2 text-xs sm:text-sm rounded-xl custom-input font-bold"
+                            />
+                            {selectedDailyDate !== todayISO && (
+                              <button
+                                onClick={() => setSelectedDailyDate(todayISO)}
+                                className="px-3 py-2 bg-amber-100 text-amber-900 hover:bg-amber-200 rounded-xl text-xs font-bold transition whitespace-nowrap"
+                              >
+                                วันนี้
+                              </button>
+                            )}
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                           <div className="bg-amber-50 border border-amber-200/80 rounded-2xl p-4 text-center">
-                            <span className="text-xs font-bold text-amber-800 block">ยอดขายรวมวันนี้</span>
+                            <span className="text-xs font-bold text-amber-800 block">ยอดขายรวมประจำวัน</span>
                             <span className="text-2xl sm:text-3xl font-black text-amber-700 mt-1 block">
-                              {todaySalesSummary.totalMoney.toLocaleString()} <span className="text-xs font-normal">บาท</span>
+                              {selectedDailySalesSummary.totalMoney.toLocaleString()} <span className="text-xs font-normal">บาท</span>
                             </span>
                           </div>
 
                           <div className="bg-orange-50 border border-orange-200/80 rounded-2xl p-4 text-center">
                             <span className="text-xs font-bold text-orange-800 block">จำนวนเครื่องดื่มที่ขายได้</span>
                             <span className="text-2xl sm:text-3xl font-black text-orange-700 mt-1 block">
-                              {todaySalesSummary.totalCups.toLocaleString()} <span className="text-xs font-normal">แก้ว/หน่วย</span>
+                              {selectedDailySalesSummary.totalCups.toLocaleString()} <span className="text-xs font-normal">แก้ว/หน่วย</span>
                             </span>
                           </div>
 
                           <div className="bg-stone-50 border border-stone-200 rounded-2xl p-4 text-center">
-                            <span className="text-xs font-bold text-stone-700 block">จำนวนรายการขาย</span>
+                            <span className="text-xs font-bold text-stone-700 block">จำนวนออเดอร์ที่ขาย</span>
                             <span className="text-2xl sm:text-3xl font-black text-stone-800 mt-1 block">
-                              {todaySalesSummary.count} <span className="text-xs font-normal">รายการ</span>
+                              {selectedDailySalesSummary.count} <span className="text-xs font-normal">รายการ</span>
                             </span>
                           </div>
                         </div>
+
+                        {/* ตารางออเดอร์รายวัน */}
+                        <div>
+                          <h3 className="font-bold text-sm text-stone-700 mb-3">รายการขายในวันที่ {selectedDailyDate} ({selectedDailySalesSummary.logs.length} รายการ)</h3>
+                          {selectedDailySalesSummary.logs.length === 0 ? (
+                            <div className="text-center py-8 text-stone-400 text-xs italic">ไม่มีข้อมูลการขายในวันที่เลือก</div>
+                          ) : (
+                            <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
+                              {selectedDailySalesSummary.logs.map(log => (
+                                <div key={log.id} className="bg-stone-50 border border-stone-200 p-3 rounded-2xl flex items-center justify-between gap-2 text-xs">
+                                  <div>
+                                    <span className="font-bold text-amber-950 text-sm block">{log.menuName}</span>
+                                    <span className="text-stone-400 text-[11px]">{log.datetime} {log.note ? `• ${log.note}` : ''}</span>
+                                  </div>
+                                  <div className="flex items-center gap-3">
+                                    <div className="text-right">
+                                      <span className="font-black text-amber-800 text-sm block">+{log.totalAmount} ฿</span>
+                                      <span className="text-[10px] text-stone-500">{log.cups} หน่วย @ {log.pricePerCup}฿</span>
+                                    </div>
+                                    <button onClick={() => handleDeleteSale(log.id)} className="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg">
+                                      <i data-lucide="trash-2" className="w-4 h-4"></i>
+                                    </button>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       </div>
 
+                      {/* สรุปรายเดือน */}
                       <div className="bg-white rounded-3xl p-5 sm:p-8 border border-amber-200/60 custom-shadow">
                         <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 pb-4 border-b border-stone-100 mb-4">
                           <div>
@@ -2283,11 +1919,11 @@
                         </div>
 
                         <div>
-                          <h3 className="font-bold text-sm text-stone-700 mb-3">ประวัติรายการขาย ({monthSalesSummary.monthLogs.length} รายการ)</h3>
+                          <h3 className="font-bold text-sm text-stone-700 mb-3">ประวัติรายการขายเดือนนี้ ({monthSalesSummary.monthLogs.length} รายการ)</h3>
                           {monthSalesSummary.monthLogs.length === 0 ? (
                             <div className="text-center py-8 text-stone-400 text-xs italic">ไม่มีข้อมูลการขายในเดือนนี้</div>
                           ) : (
-                            <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1">
+                            <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
                               {monthSalesSummary.monthLogs.map(log => (
                                 <div key={log.id} className="bg-stone-50 border border-stone-200 p-3 rounded-2xl flex items-center justify-between gap-2 text-xs">
                                   <div>
@@ -2354,10 +1990,6 @@
                         <div className="flex flex-wrap items-center gap-2">
                           <button onClick={() => setStockCategorySummaryModalOpen(true)} className="btn-pill bg-amber-800 hover:bg-amber-900 text-xs px-3.5 py-2 active:scale-95 shadow-md flex-1 sm:flex-none">
                             <i data-lucide="clipboard-list" className="w-3.5 h-3.5"></i> สรุปตามหมวดหมู่
-                          </button>
-
-                          <button onClick={() => setTransferModalOpen(true)} className="btn-pill btn-tea text-xs px-3.5 py-2 active:scale-95 flex-1 sm:flex-none">
-                            <i data-lucide="upload" className="w-3.5 h-3.5"></i> เอาของออกไปหน้าร้าน
                           </button>
 
                           <button onClick={() => setRestockModalOpen(true)} className="btn-pill btn-boba text-xs px-3.5 py-2 active:scale-95 flex-1 sm:flex-none">
@@ -2474,7 +2106,7 @@
                     </div>
                   )}
 
-                  {/* TAB 4: สูตรการผลิต & กำหนดราคา (BOM) */}
+                  {/* TAB 4: สูตรการผลิต (BOM) */}
                   {activeTab === 'bom' && (
                     <div className="bg-white rounded-3xl p-4 sm:p-8 border border-amber-200/60 custom-shadow">
                       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-6 pb-4 border-b border-stone-100">
@@ -2563,14 +2195,14 @@
                     </div>
                   )}
 
-                  {/* TAB 5: ประวัติการสั่งปรุง/ขาย */}
+                  {/* TAB 5: ประวัติสั่งปรุง/ขาย */}
                   {activeTab === 'history' && (
                     <div className="bg-white rounded-3xl p-4 sm:p-8 border border-amber-200/60 custom-shadow">
                       <div className="mb-6 pb-4 border-b border-stone-100">
                         <h2 className="text-lg sm:text-xl font-bold text-amber-950 flex items-center gap-2">
                           <span>📜</span> ประวัติบันทึกการสั่งปรุง & ขาย
                         </h2>
-                        <p className="text-xs text-stone-400 mt-1">ตรวจสอบประวัติการปรุง ยอดตัดสต๊อก หรือแก้ไข/ลบรายการที่บันทึกผิด</p>
+                        <p className="text-xs text-stone-400 mt-1">ตรวจสอบประวัติการปรุง ยอดตัดสต๊อก หรือแก้ไข/ลบรายการที่บันทึกผิด (ระบบจะลบยอดขายออกด้วย)</p>
                       </div>
 
                       <div className="mb-5 relative">
@@ -2649,80 +2281,6 @@
                       )}
                     </div>
                   )}
-
-                  {/* TAB 6: บันทึกวัตถุดิบ เข้า - ออก */}
-                  {activeTab === 'movements' && (
-                    <div className="bg-white rounded-3xl p-4 sm:p-8 border border-amber-200/60 custom-shadow">
-                      <div className="mb-6 pb-4 border-b border-stone-100">
-                        <h2 className="text-lg sm:text-xl font-bold text-amber-950 flex items-center gap-2">
-                          <span>🔄</span> บันทึกการเข้า-ออกของวัตถุดิบ
-                        </h2>
-                        <p className="text-xs text-stone-400 mt-1">ดูประวัติการเติมของเข้าคลัง หรือการเบิกเอาของออกไปหน้าร้าน</p>
-                      </div>
-
-                      <div className="mb-5 relative">
-                        <input
-                          type="text"
-                          placeholder="ค้นหาบันทึกการเบิก/เติมวัตถุดิบ..."
-                          value={searchMovement}
-                          onChange={(e) => setSearchMovement(e.target.value)}
-                          className="w-full px-4 py-3 text-xs sm:text-sm rounded-xl custom-input pl-10"
-                        />
-                        <span className="absolute left-3.5 top-3.5 text-stone-400 text-xs">🔍</span>
-                      </div>
-
-                      {filteredMovements.length === 0 ? (
-                        <div className="text-center py-16 text-stone-400 text-xs sm:text-sm">ยังไม่มีประวัติการเติมหรือเบิกวัตถุดิบ</div>
-                      ) : (
-                        <div className="space-y-3">
-                          {filteredMovements.map(log => {
-                            const isRestock = log.type === 'เติมสต๊อก';
-                            return (
-                              <div key={log.id} className="bg-stone-50 border border-stone-200 p-4 rounded-2xl flex flex-col justify-between gap-3">
-                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-200/60 pb-2.5">
-                                  <div>
-                                    <div className="flex items-center gap-2">
-                                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${isRestock ? 'bg-amber-100 text-amber-900' : 'bg-orange-100 text-orange-900'}`}>
-                                        {log.type}
-                                      </span>
-                                      <span className="text-[11px] text-stone-400 font-medium">{log.datetime}</span>
-                                    </div>
-                                    <h3 className="font-bold text-sm sm:text-base text-amber-950 mt-1">{log.title}</h3>
-                                    {log.note && <p className="text-xs text-stone-500 italic mt-0.5">หมายเหตุ: {log.note}</p>}
-                                  </div>
-
-                                  <div className="flex items-center gap-2 self-end sm:self-center">
-                                    <button
-                                      onClick={() => setMovementToEdit(log)}
-                                      className="text-xs font-bold text-amber-800 bg-amber-100/60 hover:bg-amber-100 border border-amber-200 px-3 py-1.5 rounded-xl transition flex items-center gap-1"
-                                    >
-                                      <i data-lucide="edit-3" className="w-3.5 h-3.5"></i> แก้ไข
-                                    </button>
-                                    <button
-                                      onClick={() => setLogToDelete(log)}
-                                      className="text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200 px-3 py-1.5 rounded-xl transition flex items-center gap-1"
-                                    >
-                                      <i data-lucide="trash-2" className="w-3.5 h-3.5"></i> ลบ
-                                    </button>
-                                  </div>
-                                </div>
-
-                                {log.details && (
-                                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
-                                    {log.details.map((d, idx) => (
-                                      <div key={idx} className="bg-white px-2.5 py-1.5 rounded-lg border border-stone-200 text-[11px] font-medium text-stone-700">
-                                        {d}
-                                      </div>
-                                    ))}
-                                  </div>
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  )}
                 </>
               )}
             </main>
@@ -2730,7 +2288,7 @@
 
           {/* Footer */}
           <footer className="bg-white border-t border-amber-200/60 py-4 text-center text-xs text-amber-900/50 mt-8">
-            <p>© {new Date().getFullYear()} ระบบสต๊อก & คิดเงินร้านติดใจ (Boba Milk Tea Edition)</p>
+            <p>© {new Date().getFullYear()} ระบบสต๊อก & คิดเงิน - ชานมกลมกล่อม</p>
           </footer>
 
           {/* ALL MODALS */}
@@ -2767,14 +2325,6 @@
             onConfirmBatchRestock={handleBatchRestock}
           />
 
-          <TransferModal
-            isOpen={transferModalOpen}
-            onClose={() => setTransferModalOpen(false)}
-            stocks={stocks}
-            categories={categories}
-            onConfirmBatchTransfer={handleBatchTransfer}
-          />
-
           <RecipeModal
             isOpen={recipeModalOpen}
             onClose={() => setRecipeModalOpen(false)}
@@ -2782,14 +2332,6 @@
             editingRecipe={editingRecipe}
             stocks={stocks}
             handleImageUpload={handleImageUpload}
-          />
-
-          <EditMovementModal
-            isOpen={!!movementToEdit}
-            onClose={() => setMovementToEdit(null)}
-            movementLog={movementToEdit}
-            stocks={stocks}
-            onSave={handleSaveMovementEdit}
           />
 
           <EditProductionLogModal
