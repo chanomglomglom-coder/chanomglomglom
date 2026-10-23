@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>ระบบสต๊อกของร้านติดใจ & เติมของร้านติดใจ (Mobile Edition)</title>
-  <meta property="og:title" content="ระบบสต๊อกของ & เติมของ & ยอดขาย" />
-  <meta property="og:description" content="ระบบจัดการสต๊อก คำนวณการปรุง เติมของประจำวัน และบันทึกยอดขาย" />
+  <title>ระบบสต๊อก & ยอดขาย ร้านติดใจ (Boba Milk Tea Edition)</title>
+  <meta property="og:title" content="ระบบสต๊อก & ยอดขาย ร้านติดใจ" />
+  <meta property="og:description" content="ระบบจัดการสต๊อก คำนวณการปรุง และสรุปยอดขายแบบครบวงจร" />
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -24,21 +24,28 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <style>
-    body { font-family: 'Prompt', sans-serif; background-color: #f1f5f9; -webkit-tap-highlight-color: transparent; }
-    .custom-shadow { box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05); }
+    /* Boba Milk Tea Color Palette */
+    body { 
+      font-family: 'Prompt', sans-serif; 
+      background-color: #f7f3ee; /* ครีมนมสด */
+      color: #3d2b1f; /* น้ำตาลเข้มไข่มุก */
+      -webkit-tap-highlight-color: transparent; 
+    }
+
+    .custom-shadow { box-shadow: 0 4px 20px -2px rgba(61, 43, 31, 0.08); }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     
     .custom-input {
-      background-color: #f8fafc;
-      border: 1.5px solid #cbd5e1;
-      color: #0f172a;
+      background-color: #fffdfa;
+      border: 1.5px solid #e2d7cd;
+      color: #3d2b1f;
       transition: all 0.2s ease-in-out;
     }
     .custom-input:focus {
       background-color: #ffffff;
-      border-color: #10b981;
-      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+      border-color: #c08552;
+      box-shadow: 0 0 0 3px rgba(192, 133, 82, 0.2);
       outline: none;
     }
 
@@ -56,23 +63,23 @@
       transition: all 0.2s ease-in-out;
       cursor: pointer;
     }
-    .btn-orange-pill {
-      background-color: #f59e0b;
-      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+    .btn-boba {
+      background-color: #8c5a3c;
+      box-shadow: 0 4px 14px rgba(140, 90, 60, 0.3);
     }
-    .btn-orange-pill:hover { background-color: #d97706; }
+    .btn-boba:hover { background-color: #6f442b; }
 
-    .btn-green-pill {
-      background-color: #059669;
-      box-shadow: 0 4px 14px rgba(5, 150, 105, 0.35);
+    .btn-tea {
+      background-color: #c08552;
+      box-shadow: 0 4px 14px rgba(192, 133, 82, 0.3);
     }
-    .btn-green-pill:hover { background-color: #047857; }
+    .btn-tea:hover { background-color: #a66f3f; }
 
-    .btn-dark-pill {
-      background-color: #1e293b;
-      box-shadow: 0 4px 14px rgba(30, 41, 59, 0.35);
+    .btn-dark-boba {
+      background-color: #2b1e16;
+      box-shadow: 0 4px 14px rgba(43, 30, 22, 0.3);
     }
-    .btn-dark-pill:hover { background-color: #0f172a; }
+    .btn-dark-boba:hover { background-color: #1a120d; }
 
     /* A4 Simulation Style */
     .a4-container {
@@ -104,7 +111,7 @@
     }
   </style>
 </head>
-<body class="text-slate-800 antialiased selection:bg-emerald-500 selection:text-white">
+<body class="selection:bg-amber-700 selection:text-white">
   <div id="root"></div>
 
   <script type="text/babel">
@@ -163,15 +170,15 @@
       };
 
       return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 max-h-[85vh] flex flex-col justify-between">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-stone-100 max-h-[85vh] flex flex-col justify-between">
             <div>
-              <div className="flex justify-between items-center pb-3 border-b border-slate-100 mb-4">
-                <h3 className="font-bold text-lg text-slate-800 flex items-center gap-2">
-                  <i data-lucide="tag" className="w-5 h-5 text-emerald-600"></i>
+              <div className="flex justify-between items-center pb-3 border-b border-stone-100 mb-4">
+                <h3 className="font-bold text-lg text-amber-900 flex items-center gap-2">
+                  <i data-lucide="tag" className="w-5 h-5 text-amber-700"></i>
                   จัดการหมวดหมู่สินค้า
                 </h3>
-                <button onClick={onClose} className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition">
+                <button onClick={onClose} className="p-1 rounded-lg text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition">
                   <i data-lucide="x" className="w-5 h-5"></i>
                 </button>
               </div>
@@ -184,14 +191,14 @@
                   onChange={(e) => setNewCatName(e.target.value)}
                   className="flex-1 px-3 py-2 text-xs sm:text-sm rounded-xl custom-input"
                 />
-                <button type="submit" className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs px-4 py-2 rounded-xl transition">
+                <button type="submit" className="bg-amber-700 hover:bg-amber-800 text-white font-bold text-xs px-4 py-2 rounded-xl transition">
                   + เพิ่ม
                 </button>
               </form>
 
               <div className="space-y-2 max-h-[40vh] overflow-y-auto pr-1">
                 {categories.map(cat => (
-                  <div key={cat.id} className="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl flex justify-between items-center text-xs font-semibold text-slate-700">
+                  <div key={cat.id} className="bg-amber-50/50 border border-amber-200/60 px-3 py-2 rounded-xl flex justify-between items-center text-xs font-semibold text-amber-950">
                     <span>{cat.name}</span>
                     <button onClick={() => onDeleteCategory(cat.id)} className="text-rose-500 hover:text-rose-700 p-1 rounded hover:bg-rose-50">
                       <i data-lucide="trash-2" className="w-4 h-4"></i>
@@ -199,13 +206,13 @@
                   </div>
                 ))}
                 {categories.length === 0 && (
-                  <div className="text-center py-6 text-slate-400 text-xs italic">ยังไม่มีหมวดหมู่</div>
+                  <div className="text-center py-6 text-stone-400 text-xs italic">ยังไม่มีหมวดหมู่</div>
                 )}
               </div>
             </div>
 
-            <div className="pt-4 border-t border-slate-100 mt-4 text-right">
-              <button onClick={onClose} className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs rounded-xl transition">
+            <div className="pt-4 border-t border-stone-100 mt-4 text-right">
+              <button onClick={onClose} className="w-full py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-600 font-bold text-xs rounded-xl transition">
                 ปิด
               </button>
             </div>
@@ -215,7 +222,7 @@
     }
 
     // ==========================================
-    // MODAL: สรุปรายการวัตถุดิบคงเหลือแยกตามหมวดหมู่ (แบบ 1 หน้า A4 Mobile + แชร์)
+    // MODAL: สรุปรายการวัตถุดิบคงเหลือแยกตามหมวดหมู่
     // ==========================================
     function StockSummaryByCategoryModal({ isOpen, onClose, stocks, categories }) {
       if (!isOpen) return null;
@@ -235,7 +242,6 @@
 
       const todayStr = new Date().toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' });
 
-      // ฟังก์ชันแชร์ข้อความสรุป
       const handleShare = async () => {
         let text = `📦 สรุปวัตถุดิบคงเหลือร้านติดใจ (${todayStr})\n------------------------\n`;
         categorizedStocks.forEach(group => {
@@ -258,40 +264,38 @@
       };
 
       return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-900/70 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-2xl max-w-md w-full p-4 sm:p-6 shadow-2xl border border-slate-100 h-[92vh] flex flex-col justify-between">
-            {/* Header */}
-            <div className="flex justify-between items-center pb-2.5 border-b border-slate-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-stone-900/70 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-2xl max-w-md w-full p-4 sm:p-6 shadow-2xl border border-stone-100 h-[92vh] flex flex-col justify-between">
+            <div className="flex justify-between items-center pb-2.5 border-b border-stone-200">
               <div>
-                <h3 className="font-bold text-base sm:text-lg text-slate-800 flex items-center gap-2">
-                  <i data-lucide="clipboard-check" className="w-5 h-5 text-indigo-600"></i>
-                  สรุปสต๊อกตามหมวดหมู่ (A4)
+                <h3 className="font-bold text-base sm:text-lg text-amber-900 flex items-center gap-2">
+                  <i data-lucide="clipboard-check" className="w-5 h-5 text-amber-700"></i>
+                  สรุปสต๊อกตามหมวดหมู่
                 </h3>
-                <p className="text-[10px] text-slate-400">ร้านติดใจ | ประจำวันที่ {todayStr}</p>
+                <p className="text-[10px] text-stone-400">ร้านติดใจ | ประจำวันที่ {todayStr}</p>
               </div>
-              <button onClick={onClose} className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition">
+              <button onClick={onClose} className="p-1 rounded-lg text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition">
                 <i data-lucide="x" className="w-5 h-5"></i>
               </button>
             </div>
 
-            {/* A4 Mobile Summary Content - พอดี 1 หน้ากระดาษ */}
             <div className="flex-1 overflow-y-auto py-3 space-y-3 no-scrollbar my-1">
               {categorizedStocks.map(catGroup => {
                 if (catGroup.items.length === 0) return null;
                 return (
-                  <div key={catGroup.categoryName} className="bg-slate-50 border border-slate-200 rounded-xl p-2.5">
-                    <div className="font-bold text-xs text-indigo-700 border-b border-slate-200 pb-1 mb-1.5 flex justify-between">
+                  <div key={catGroup.categoryName} className="bg-amber-50/40 border border-amber-200/60 rounded-xl p-2.5">
+                    <div className="font-bold text-xs text-amber-800 border-b border-amber-200/40 pb-1 mb-1.5 flex justify-between">
                       <span>🏷️ {catGroup.categoryName}</span>
-                      <span className="text-[10px] text-slate-400 font-normal">({catGroup.items.length} รายการ)</span>
+                      <span className="text-[10px] text-stone-400 font-normal">({catGroup.items.length} รายการ)</span>
                     </div>
                     <div className="grid grid-cols-2 gap-1.5">
                       {catGroup.items.map(item => {
                         const isLow = Number(item.current) <= Number(item.minAlert || 0);
                         return (
-                          <div key={item.id} className="bg-white px-2 py-1.5 rounded-lg border border-slate-200 flex items-center justify-between text-[11px]">
-                            <span className="font-medium text-slate-800 truncate pr-1">{item.name}</span>
-                            <span className={`font-bold whitespace-nowrap ${isLow ? 'text-rose-600' : 'text-slate-700'}`}>
-                              {item.current} <span className="text-[9px] font-normal text-slate-400">{item.unit}</span>
+                          <div key={item.id} className="bg-white px-2 py-1.5 rounded-lg border border-stone-200 flex items-center justify-between text-[11px]">
+                            <span className="font-medium text-stone-800 truncate pr-1">{item.name}</span>
+                            <span className={`font-bold whitespace-nowrap ${isLow ? 'text-rose-600' : 'text-stone-700'}`}>
+                              {item.current} <span className="text-[9px] font-normal text-stone-400">{item.unit}</span>
                             </span>
                           </div>
                         );
@@ -302,12 +306,11 @@
               })}
             </div>
 
-            {/* Footer / Buttons */}
-            <div className="pt-2.5 border-t border-slate-100 flex gap-2">
-              <button onClick={handleShare} className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-1.5">
+            <div className="pt-2.5 border-t border-stone-100 flex gap-2">
+              <button onClick={handleShare} className="flex-1 py-2.5 bg-amber-800 hover:bg-amber-900 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-1.5">
                 <i data-lucide="share-2" className="w-4 h-4"></i> กดแชร์รายการสรุป
               </button>
-              <button onClick={onClose} className="py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs rounded-xl transition">
+              <button onClick={onClose} className="py-2.5 px-4 bg-stone-100 hover:bg-stone-200 text-stone-600 font-bold text-xs rounded-xl transition">
                 ปิด
               </button>
             </div>
@@ -317,7 +320,7 @@
     }
 
     // ==========================================
-    // MODAL: แก้ไขรายการวัตถุดิบรายตัว (Movement Log Item Editor)
+    // MODAL: แก้ไขรายการวัตถุดิบรายตัว (Movement Log)
     // ==========================================
     function EditMovementModal({ isOpen, onClose, movementLog, stocks, onSave }) {
       const [itemsMap, setItemsMap] = useState({});
@@ -351,18 +354,18 @@
       };
 
       return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 max-h-[85vh] flex flex-col justify-between">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-stone-100 max-h-[85vh] flex flex-col justify-between">
             <div>
-              <div className="flex justify-between items-center pb-3 border-b border-slate-100 mb-4">
+              <div className="flex justify-between items-center pb-3 border-b border-stone-100 mb-4">
                 <div>
-                  <h3 className="font-bold text-base text-slate-800 flex items-center gap-2">
-                    <i data-lucide="edit-3" className="w-5 h-5 text-amber-600"></i>
+                  <h3 className="font-bold text-base text-amber-900 flex items-center gap-2">
+                    <i data-lucide="edit-3" className="w-5 h-5 text-amber-700"></i>
                     แก้ไขรายการวัตถุดิบ ({isRestock ? 'เติมของ' : 'เอาออก'})
                   </h3>
-                  <p className="text-[11px] text-slate-400">ปรับแก้เฉพาะจำนวนของวัตถุดิบตัวที่บันทึกผิด</p>
+                  <p className="text-[11px] text-stone-400">ปรับแก้เฉพาะจำนวนของวัตถุดิบตัวที่บันทึกผิด</p>
                 </div>
-                <button onClick={onClose} className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition">
+                <button onClick={onClose} className="p-1 rounded-lg text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition">
                   <i data-lucide="x" className="w-5 h-5"></i>
                 </button>
               </div>
@@ -375,17 +378,17 @@
                     const stockUnit = stockItem ? stockItem.unit : '';
 
                     return (
-                      <div key={stockId} className="bg-slate-50 border border-slate-200 p-3 rounded-2xl flex items-center justify-between gap-2">
-                        <span className="font-bold text-xs text-slate-800 truncate flex-1">{stockName}</span>
+                      <div key={stockId} className="bg-stone-50 border border-stone-200 p-3 rounded-2xl flex items-center justify-between gap-2">
+                        <span className="font-bold text-xs text-stone-800 truncate flex-1">{stockName}</span>
                         <div className="flex items-center gap-1.5 w-32">
                           <input
                             type="number"
                             step="any"
                             value={qty}
                             onChange={(e) => handleValChange(stockId, e.target.value)}
-                            className="w-full px-2.5 py-1.5 text-xs text-center font-bold text-amber-700 bg-white rounded-xl border border-slate-300 focus:outline-none"
+                            className="w-full px-2.5 py-1.5 text-xs text-center font-bold text-amber-800 bg-white rounded-xl border border-stone-300 focus:outline-none"
                           />
-                          <span className="text-[11px] text-slate-400">{stockUnit}</span>
+                          <span className="text-[11px] text-stone-400">{stockUnit}</span>
                         </div>
                       </div>
                     );
@@ -393,7 +396,7 @@
                 </div>
 
                 <div className="pt-2">
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">หมายเหตุ</label>
+                  <label className="block text-xs font-semibold text-stone-600 mb-1">หมายเหตุ</label>
                   <input
                     type="text"
                     value={note}
@@ -404,11 +407,11 @@
               </form>
             </div>
 
-            <div className="pt-3 border-t border-slate-100 flex gap-2 mt-4">
-              <button type="button" onClick={onClose} className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs rounded-xl transition">
+            <div className="pt-3 border-t border-stone-100 flex gap-2 mt-4">
+              <button type="button" onClick={onClose} className="flex-1 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-600 font-bold text-xs rounded-xl transition">
                 ยกเลิก
               </button>
-              <button type="submit" form="editMovementForm" className="flex-1 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow-md transition">
+              <button type="submit" form="editMovementForm" className="flex-1 py-2.5 bg-amber-700 hover:bg-amber-800 text-white font-bold text-xs rounded-xl shadow-md transition">
                 บันทึกการแก้ไข
               </button>
             </div>
@@ -418,7 +421,7 @@
     }
 
     // ==========================================
-    // MODAL: แก้ไขบันทึกการผลิต (ลบเมนูที่ติ๊กผิด เช่น ชาไทย)
+    // MODAL: แก้ไขบันทึกการผลิต
     // ==========================================
     function EditProductionLogModal({ isOpen, onClose, logToEdit, onSave }) {
       const [itemsMap, setItemsMap] = useState({});
@@ -428,11 +431,10 @@
         if (logToEdit) {
           setNote(logToEdit.note || '');
           const initialMap = {};
-          // แกะ title ออกมา เช่น "ปรุง ชาไทย (2 ถัง), ชานม (1 ถัง)"
           if (logToEdit.title) {
-            const raw = logToEdit.title.replace(/^(ปรุง|ต้ม)\s+/, '').split(', ');
+            const raw = logToEdit.title.replace(/^(ปรุง|สั่งปรุง|ต้ม)\s+/, '').split(', ');
             raw.forEach(item => {
-              const match = item.match(/(.+) \((\d+) (ถัง|หม้อ)\)/);
+              const match = item.match(/(.+) \((\d+) (ถัง|แก้ว|หม้อ)\)/);
               if (match) {
                 const name = match[1].trim();
                 const count = parseInt(match[2], 10);
@@ -465,18 +467,18 @@
       };
 
       return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 max-h-[85vh] flex flex-col justify-between">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-stone-100 max-h-[85vh] flex flex-col justify-between">
             <div>
-              <div className="flex justify-between items-center pb-3 border-b border-slate-100 mb-4">
+              <div className="flex justify-between items-center pb-3 border-b border-stone-100 mb-4">
                 <div>
-                  <h3 className="font-bold text-base text-slate-800 flex items-center gap-2">
-                    <i data-lucide="edit-3" className="w-5 h-5 text-emerald-600"></i>
-                    แก้ไขรายการการผลิตที่เลือกผิด
+                  <h3 className="font-bold text-base text-amber-900 flex items-center gap-2">
+                    <i data-lucide="edit-3" className="w-5 h-5 text-amber-700"></i>
+                    แก้ไขรายการสั่งปรุง/ขาย
                   </h3>
-                  <p className="text-[11px] text-slate-400">ปรับแก้จำนวนถัง หรือกดลบรายการที่หลงติ๊กผิดออกได้ทันที</p>
+                  <p className="text-[11px] text-stone-400">ปรับแก้จำนวน หรือลบรายการที่คีย์ผิดออกได้ทันที</p>
                 </div>
-                <button onClick={onClose} className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition">
+                <button onClick={onClose} className="p-1 rounded-lg text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition">
                   <i data-lucide="x" className="w-5 h-5"></i>
                 </button>
               </div>
@@ -484,34 +486,30 @@
               <form id="editProdForm" onSubmit={handleSubmit} className="space-y-3">
                 <div className="max-h-[45vh] overflow-y-auto pr-1 space-y-2">
                   {Object.entries(itemsMap).map(([name, qty]) => (
-                    <div key={name} className="bg-slate-50 border border-slate-200 p-2.5 rounded-2xl flex items-center justify-between gap-2">
-                      <span className="font-bold text-xs text-slate-800 truncate flex-1">{name}</span>
+                    <div key={name} className="bg-stone-50 border border-stone-200 p-2.5 rounded-2xl flex items-center justify-between gap-2">
+                      <span className="font-bold text-xs text-stone-800 truncate flex-1">{name}</span>
                       <div className="flex items-center gap-2">
                         <input
                           type="number"
                           value={qty}
                           onChange={(e) => handleQtyChange(name, e.target.value)}
-                          className="w-16 px-2 py-1 text-xs text-center font-bold text-emerald-700 bg-white rounded-xl border border-slate-300 focus:outline-none"
+                          className="w-16 px-2 py-1 text-xs text-center font-bold text-amber-800 bg-white rounded-xl border border-stone-300 focus:outline-none"
                         />
-                        <span className="text-[11px] text-slate-400">ถัง</span>
+                        <span className="text-[11px] text-stone-400">หน่วย</span>
                         <button
                           type="button"
                           onClick={() => handleRemoveItem(name)}
                           className="p-1 text-rose-500 hover:bg-rose-50 rounded-lg"
-                          title="ลบรายการนี้ออก"
                         >
                           <i data-lucide="trash-2" className="w-4 h-4"></i>
                         </button>
                       </div>
                     </div>
                   ))}
-                  {Object.keys(itemsMap).length === 0 && (
-                    <div className="text-center py-6 text-slate-400 text-xs italic">ไม่มีรายการการผลิตคงเหลือ</div>
-                  )}
                 </div>
 
                 <div className="pt-2">
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">หมายเหตุ</label>
+                  <label className="block text-xs font-semibold text-stone-600 mb-1">หมายเหตุ</label>
                   <input
                     type="text"
                     value={note}
@@ -522,11 +520,11 @@
               </form>
             </div>
 
-            <div className="pt-3 border-t border-slate-100 flex gap-2 mt-4">
-              <button type="button" onClick={onClose} className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs rounded-xl transition">
+            <div className="pt-3 border-t border-stone-100 flex gap-2 mt-4">
+              <button type="button" onClick={onClose} className="flex-1 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-600 font-bold text-xs rounded-xl transition">
                 ยกเลิก
               </button>
-              <button type="submit" form="editProdForm" className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md transition">
+              <button type="submit" form="editProdForm" className="flex-1 py-2.5 bg-amber-700 hover:bg-amber-800 text-white font-bold text-xs rounded-xl shadow-md transition">
                 บันทึกการแก้ไข
               </button>
             </div>
@@ -536,7 +534,7 @@
     }
 
     // ==========================================
-    // 1. MODAL: เพิ่ม/แก้ไข วัตถุดิบ (Stock Modal)
+    // MODAL: เพิ่ม/แก้ไข วัตถุดิบ (Stock Modal)
     // ==========================================
     function StockModal({ isOpen, onClose, onSave, editingStock, handleImageUpload, categories, onOpenCategoryModal }) {
       const [name, setName] = useState('');
@@ -582,28 +580,28 @@
       };
 
       return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center pb-4 border-b border-slate-100 mb-5">
-              <h3 className="font-bold text-lg text-slate-800 flex items-center gap-2">
-                <i data-lucide={editingStock ? "edit-3" : "plus-circle"} className="w-5 h-5 text-emerald-600"></i>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-stone-100 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center pb-4 border-b border-stone-100 mb-5">
+              <h3 className="font-bold text-lg text-amber-900 flex items-center gap-2">
+                <i data-lucide={editingStock ? "edit-3" : "plus-circle"} className="w-5 h-5 text-amber-700"></i>
                 {editingStock ? 'แก้ไขรายการวัตถุดิบ' : 'เพิ่มวัตถุดิบใหม่เข้าระบบ'}
               </h3>
-              <button onClick={onClose} className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition">
+              <button onClick={onClose} className="p-1 rounded-lg text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition">
                 <i data-lucide="x" className="w-5 h-5"></i>
               </button>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-600 mb-1">ชื่อวัตถุดิบ <span className="text-rose-500">*</span></label>
-                <input type="text" placeholder="เช่น น้ำปรุงรสสูตรเข้มข้น / ซอสผัด" value={name} onChange={e => setName(e.target.value)} required className="w-full px-4 py-3 text-sm rounded-xl custom-input" />
+                <label className="block text-xs font-semibold text-stone-600 mb-1">ชื่อวัตถุดิบ <span className="text-rose-500">*</span></label>
+                <input type="text" placeholder="เช่น ชาตรามือ / นมสด / ไข่มุก" value={name} onChange={e => setName(e.target.value)} required className="w-full px-4 py-3 text-sm rounded-xl custom-input" />
               </div>
 
               <div>
                 <div className="flex justify-between items-center mb-1">
-                  <label className="block text-xs font-semibold text-slate-600">หมวดหมู่</label>
-                  <button type="button" onClick={onOpenCategoryModal} className="text-[11px] text-emerald-600 font-bold hover:underline">⚙️ จัดการหมวดหมู่</button>
+                  <label className="block text-xs font-semibold text-stone-600">หมวดหมู่</label>
+                  <button type="button" onClick={onOpenCategoryModal} className="text-[11px] text-amber-700 font-bold hover:underline">⚙️ จัดการหมวดหมู่</button>
                 </div>
                 <select value={category} onChange={e => setCategory(e.target.value)} className="w-full px-3 py-3 text-sm rounded-xl custom-input">
                   {categories.map((cat) => (
@@ -614,37 +612,37 @@
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-600 mb-1">หน่วยเรียกหลัก <span className="text-rose-500">*</span></label>
-                <input type="text" placeholder="เช่น ถัง, กิโลกรัม, ขวด" value={unit} onChange={e => setUnit(e.target.value)} required className="w-full px-4 py-3 text-sm rounded-xl custom-input" />
+                <label className="block text-xs font-semibold text-stone-600 mb-1">หน่วยเรียกหลัก <span className="text-rose-500">*</span></label>
+                <input type="text" placeholder="เช่น ถุง, กิโลกรัม, ลิตร, ถัง" value={unit} onChange={e => setUnit(e.target.value)} required className="w-full px-4 py-3 text-sm rounded-xl custom-input" />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">จำนวนปัจจุบัน <span className="text-rose-500">*</span></label>
+                  <label className="block text-xs font-semibold text-stone-600 mb-1">จำนวนปัจจุบัน <span className="text-rose-500">*</span></label>
                   <input type="number" step="any" placeholder="0" value={current} onChange={e => setCurrent(e.target.value)} required className="w-full px-4 py-3 text-sm rounded-xl custom-input font-bold" />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">จุดเตือนสั่งเพิ่ม (Min Alert)</label>
+                  <label className="block text-xs font-semibold text-stone-600 mb-1">จุดเตือนสั่งเพิ่ม (Min Alert)</label>
                   <input type="number" step="any" placeholder="5" value={minAlert} onChange={e => setMinAlert(e.target.value)} className="w-full px-4 py-3 text-sm rounded-xl custom-input" />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-600 mb-1">รูปภาพวัตถุดิบ</label>
+                <label className="block text-xs font-semibold text-stone-600 mb-1">รูปภาพวัตถุดิบ</label>
                 <div className="flex items-center space-x-3">
-                  <img src={image || DEFAULT_IMAGE} className="w-14 h-14 rounded-xl object-cover border border-slate-200" alt="พรีวิววัตถุดิบ" />
+                  <img src={image || DEFAULT_IMAGE} className="w-14 h-14 rounded-xl object-cover border border-stone-200" alt="พรีวิววัตถุดิบ" />
                   <input 
                     type="file" 
                     accept="image/*" 
                     onChange={(e) => handleImageUpload(e, (base64) => setImage(base64))} 
-                    className="text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100" 
+                    className="text-xs text-stone-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-amber-100 file:text-amber-900 hover:file:bg-amber-200" 
                   />
                 </div>
               </div>
 
               <div className="pt-4 flex gap-3">
-                <button type="button" onClick={onClose} className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-sm rounded-xl transition">ยกเลิก</button>
-                <button type="submit" className="flex-1 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm rounded-xl shadow-lg shadow-emerald-500/20 transition">บันทึกข้อมูล</button>
+                <button type="button" onClick={onClose} className="flex-1 py-3 bg-stone-100 hover:bg-stone-200 text-stone-600 font-bold text-sm rounded-xl transition">ยกเลิก</button>
+                <button type="submit" className="flex-1 py-3 bg-amber-700 hover:bg-amber-800 text-white font-bold text-sm rounded-xl shadow-lg shadow-amber-700/20 transition">บันทึกข้อมูล</button>
               </div>
             </form>
           </div>
@@ -653,7 +651,7 @@
     }
 
     // ==========================================
-    // 2. MODAL: เติมวัตถุดิบเข้าคลัง (Restock Batch Modal)
+    // MODAL: เติมวัตถุดิบเข้าคลัง (Restock Batch Modal)
     // ==========================================
     function RestockModal({ isOpen, onClose, stocks, categories, onConfirmBatchRestock }) {
       const [restockQtyMap, setRestockQtyMap] = useState({});
@@ -684,31 +682,30 @@
       };
 
       return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-slate-100 max-h-[90vh] flex flex-col justify-between">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-stone-100 max-h-[90vh] flex flex-col justify-between">
             <div>
-              <div className="flex justify-between items-center pb-4 border-b border-slate-100 mb-3">
+              <div className="flex justify-between items-center pb-4 border-b border-stone-100 mb-3">
                 <div>
-                  <h3 className="font-bold text-lg text-slate-800 flex items-center gap-2">
-                    <i data-lucide="plus-circle" className="w-5 h-5 text-emerald-600"></i>
+                  <h3 className="font-bold text-lg text-amber-900 flex items-center gap-2">
+                    <i data-lucide="plus-circle" className="w-5 h-5 text-amber-700"></i>
                     📥 เติมวัตถุดิบเข้าคลัง (Restock Batch)
                   </h3>
-                  <p className="text-xs text-slate-400 mt-0.5">ใส่จำนวนที่ต้องการเติมลงในช่องของแต่ละวัตถุดิบ</p>
+                  <p className="text-xs text-stone-400 mt-0.5">ใส่จำนวนที่ต้องการเติมลงในช่องของแต่ละวัตถุดิบ</p>
                 </div>
-                <button onClick={onClose} className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition">
+                <button onClick={onClose} className="p-1 rounded-lg text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition">
                   <i data-lucide="x" className="w-5 h-5"></i>
                 </button>
               </div>
 
-              {/* หมวดหมู่ให้เลือก */}
-              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-3 mb-2 border-b border-slate-100">
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-3 mb-2 border-b border-stone-100">
                 <button
                   type="button"
                   onClick={() => setSelectedCategory('all')}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
                     selectedCategory === 'all'
-                      ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      ? 'bg-amber-700 text-white shadow-md shadow-amber-700/20'
+                      : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
                   }`}
                 >
                   ทั้งหมด
@@ -720,8 +717,8 @@
                     onClick={() => setSelectedCategory(cat.name)}
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
                       selectedCategory === cat.name
-                        ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        ? 'bg-amber-700 text-white shadow-md shadow-amber-700/20'
+                        : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
                     }`}
                   >
                     {cat.name}
@@ -734,42 +731,42 @@
                   {filteredStocks.map(stock => {
                     const isLow = Number(stock.current) <= Number(stock.minAlert || 0);
                     return (
-                      <div key={stock.id} className={`p-3.5 rounded-2xl border flex items-center justify-between gap-3 ${isLow ? 'bg-rose-50/50 border-rose-200' : 'bg-slate-50 border-slate-200'}`}>
+                      <div key={stock.id} className={`p-3.5 rounded-2xl border flex items-center justify-between gap-3 ${isLow ? 'bg-rose-50/50 border-rose-200' : 'bg-amber-50/20 border-amber-200/50'}`}>
                         <div className="flex-1 min-w-0 flex items-center gap-3">
                           <img src={stock.image || DEFAULT_IMAGE} className="w-10 h-10 rounded-lg object-cover border" alt={stock.name} />
                           <div>
                             <div className="flex items-center space-x-2">
-                              <span className="font-bold text-sm text-slate-800 truncate">{stock.name}</span>
+                              <span className="font-bold text-sm text-amber-950 truncate">{stock.name}</span>
                               {isLow && <span className="text-[10px] bg-rose-100 text-rose-600 px-2 py-0.5 rounded font-bold">ใกล้หมด</span>}
                             </div>
-                            <span className="text-xs text-slate-400">ปัจจุบัน: <strong className="text-slate-700">{stock.current}</strong> {stock.unit}</span>
+                            <span className="text-xs text-stone-400">ปัจจุบัน: <strong className="text-stone-700">{stock.current}</strong> {stock.unit}</span>
                           </div>
                         </div>
                         <div className="w-36 flex items-center space-x-1.5">
-                          <span className="text-xs font-bold text-emerald-600">+</span>
+                          <span className="text-xs font-bold text-amber-700">+</span>
                           <input
                             type="number"
                             step="any"
                             placeholder="0"
                             value={restockQtyMap[stock.id] || ''}
                             onChange={(e) => handleQtyChange(stock.id, e.target.value)}
-                            className="w-full px-3 py-2 text-sm text-center font-bold text-emerald-700 bg-white rounded-xl border border-slate-300 focus:border-emerald-500 focus:outline-none"
+                            className="w-full px-3 py-2 text-sm text-center font-bold text-amber-800 bg-white rounded-xl border border-stone-300 focus:border-amber-700 focus:outline-none"
                           />
-                          <span className="text-xs text-slate-400 whitespace-nowrap min-w-[30px]">{stock.unit}</span>
+                          <span className="text-xs text-stone-400 whitespace-nowrap min-w-[30px]">{stock.unit}</span>
                         </div>
                       </div>
                     );
                   })}
                   {filteredStocks.length === 0 && (
-                    <div className="text-center py-8 text-slate-400 text-xs italic">ไม่พบวัตถุดิบในหมวดหมู่นี้</div>
+                    <div className="text-center py-8 text-stone-400 text-xs italic">ไม่พบวัตถุดิบในหมวดหมู่นี้</div>
                   )}
                 </div>
 
                 <div className="pt-2">
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">หมายเหตุการเติมวัตถุดิบ</label>
+                  <label className="block text-xs font-semibold text-stone-600 mb-1">หมายเหตุการเติมวัตถุดิบ</label>
                   <input
                     type="text"
-                    placeholder="เช่น เติมวัตถุดิบประจำวัน / สั่งซื้อเพิ่มจากซัพพลายเออร์..."
+                    placeholder="เช่น เติมวัตถุดิบประจำวัน..."
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
                     className="w-full px-4 py-2.5 text-sm rounded-xl custom-input"
@@ -778,9 +775,9 @@
               </form>
             </div>
 
-            <div className="pt-4 border-t border-slate-100 flex gap-3 mt-4">
-              <button type="button" onClick={onClose} className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-sm rounded-xl transition">ยกเลิก</button>
-              <button type="submit" form="restockForm" className="flex-1 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm rounded-xl shadow-lg shadow-emerald-500/20 transition">บันทึกการเติมสต๊อก</button>
+            <div className="pt-4 border-t border-stone-100 flex gap-3 mt-4">
+              <button type="button" onClick={onClose} className="flex-1 py-3 bg-stone-100 hover:bg-stone-200 text-stone-600 font-bold text-sm rounded-xl transition">ยกเลิก</button>
+              <button type="submit" form="restockForm" className="flex-1 py-3 bg-amber-700 hover:bg-amber-800 text-white font-bold text-sm rounded-xl shadow-lg shadow-amber-700/20 transition">บันทึกการเติมสต๊อก</button>
             </div>
           </div>
         </div>
@@ -788,7 +785,7 @@
     }
 
     // ==========================================
-    // 3. MODAL: เอาของออกไปหน้าร้าน (Transfer Batch Modal)
+    // MODAL: เอาของออกไปหน้าร้าน (Transfer Batch Modal)
     // ==========================================
     function TransferModal({ isOpen, onClose, stocks, categories, onConfirmBatchTransfer }) {
       const [transferQtyMap, setTransferQtyMap] = useState({});
@@ -830,31 +827,30 @@
       };
 
       return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-slate-100 max-h-[90vh] flex flex-col justify-between">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-stone-100 max-h-[90vh] flex flex-col justify-between">
             <div>
-              <div className="flex justify-between items-center pb-4 border-b border-slate-100 mb-3">
+              <div className="flex justify-between items-center pb-4 border-b border-stone-100 mb-3">
                 <div>
-                  <h3 className="font-bold text-lg text-slate-800 flex items-center gap-2">
-                    <i data-lucide="upload" className="w-5 h-5 text-amber-600"></i>
+                  <h3 className="font-bold text-lg text-amber-900 flex items-center gap-2">
+                    <i data-lucide="upload" className="w-5 h-5 text-amber-700"></i>
                     📤 เอาของออกไปหน้าร้าน (Transfer Batch)
                   </h3>
-                  <p className="text-xs text-slate-400 mt-0.5">ใส่จำนวนที่ต้องการเอาออกลงในช่องของแต่ละวัตถุดิบ</p>
+                  <p className="text-xs text-stone-400 mt-0.5">ใส่จำนวนที่ต้องการเอาออกลงในช่องของแต่ละวัตถุดิบ</p>
                 </div>
-                <button onClick={onClose} className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition">
+                <button onClick={onClose} className="p-1 rounded-lg text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition">
                   <i data-lucide="x" className="w-5 h-5"></i>
                 </button>
               </div>
 
-              {/* หมวดหมู่ให้เลือก */}
-              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-3 mb-2 border-b border-slate-100">
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-3 mb-2 border-b border-stone-100">
                 <button
                   type="button"
                   onClick={() => setSelectedCategory('all')}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
                     selectedCategory === 'all'
-                      ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      ? 'bg-amber-700 text-white shadow-md'
+                      : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
                   }`}
                 >
                   ทั้งหมด
@@ -866,8 +862,8 @@
                     onClick={() => setSelectedCategory(cat.name)}
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
                       selectedCategory === cat.name
-                        ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        ? 'bg-amber-700 text-white shadow-md'
+                        : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
                     }`}
                   >
                     {cat.name}
@@ -880,42 +876,42 @@
                   {filteredStocks.map(stock => {
                     const isLow = Number(stock.current) <= Number(stock.minAlert || 0);
                     return (
-                      <div key={stock.id} className={`p-3.5 rounded-2xl border flex items-center justify-between gap-3 ${isLow ? 'bg-rose-50/50 border-rose-200' : 'bg-slate-50 border-slate-200'}`}>
+                      <div key={stock.id} className={`p-3.5 rounded-2xl border flex items-center justify-between gap-3 ${isLow ? 'bg-rose-50/50 border-rose-200' : 'bg-amber-50/20 border-amber-200/50'}`}>
                         <div className="flex-1 min-w-0 flex items-center gap-3">
                           <img src={stock.image || DEFAULT_IMAGE} className="w-10 h-10 rounded-lg object-cover border" alt={stock.name} />
                           <div>
                             <div className="flex items-center space-x-2">
-                              <span className="font-bold text-sm text-slate-800 truncate">{stock.name}</span>
+                              <span className="font-bold text-sm text-amber-950 truncate">{stock.name}</span>
                               {isLow && <span className="text-[10px] bg-rose-100 text-rose-600 px-2 py-0.5 rounded font-bold">ใกล้หมด</span>}
                             </div>
-                            <span className="text-xs text-slate-400">ปัจจุบัน: <strong className="text-slate-700">{stock.current}</strong> {stock.unit}</span>
+                            <span className="text-xs text-stone-400">ปัจจุบัน: <strong className="text-stone-700">{stock.current}</strong> {stock.unit}</span>
                           </div>
                         </div>
                         <div className="w-36 flex items-center space-x-1.5">
-                          <span className="text-xs font-bold text-amber-600">-</span>
+                          <span className="text-xs font-bold text-amber-700">-</span>
                           <input
                             type="number"
                             step="any"
                             placeholder="0"
                             value={transferQtyMap[stock.id] || ''}
                             onChange={(e) => handleQtyChange(stock.id, e.target.value)}
-                            className="w-full px-3 py-2 text-sm text-center font-bold text-amber-700 bg-white rounded-xl border border-slate-300 focus:border-amber-500 focus:outline-none"
+                            className="w-full px-3 py-2 text-sm text-center font-bold text-amber-800 bg-white rounded-xl border border-stone-300 focus:border-amber-700 focus:outline-none"
                           />
-                          <span className="text-xs text-slate-400 whitespace-nowrap min-w-[30px]">{stock.unit}</span>
+                          <span className="text-xs text-stone-400 whitespace-nowrap min-w-[30px]">{stock.unit}</span>
                         </div>
                       </div>
                     );
                   })}
                   {filteredStocks.length === 0 && (
-                    <div className="text-center py-8 text-slate-400 text-xs italic">ไม่พบวัตถุดิบในหมวดหมู่นี้</div>
+                    <div className="text-center py-8 text-stone-400 text-xs italic">ไม่พบวัตถุดิบในหมวดหมู่นี้</div>
                   )}
                 </div>
 
                 <div className="pt-2">
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">หมายเหตุการเอาวัตถุดิบออก / ชื่อผู้เบิก</label>
+                  <label className="block text-xs font-semibold text-stone-600 mb-1">หมายเหตุการเอาวัตถุดิบออก / ชื่อผู้เบิก</label>
                   <input
                     type="text"
-                    placeholder="เช่น เอาของออกไปหน้าร้าน / เบิกโดย สมชาย..."
+                    placeholder="เช่น เบิกเอาของออกไปหน้าร้าน..."
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
                     className="w-full px-4 py-2.5 text-sm rounded-xl custom-input"
@@ -924,9 +920,9 @@
               </form>
             </div>
 
-            <div className="pt-4 border-t border-slate-100 flex gap-3 mt-4">
-              <button type="button" onClick={onClose} className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-sm rounded-xl transition">ยกเลิก</button>
-              <button type="submit" form="transferForm" className="flex-1 py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm rounded-xl shadow-lg shadow-amber-500/20 transition">บันทึกการเอาของออก</button>
+            <div className="pt-4 border-t border-stone-100 flex gap-3 mt-4">
+              <button type="button" onClick={onClose} className="flex-1 py-3 bg-stone-100 hover:bg-stone-200 text-stone-600 font-bold text-sm rounded-xl transition">ยกเลิก</button>
+              <button type="submit" form="transferForm" className="flex-1 py-3 bg-amber-700 hover:bg-amber-800 text-white font-bold text-sm rounded-xl shadow-lg shadow-amber-700/20 transition">บันทึกการเอาของออก</button>
             </div>
           </div>
         </div>
@@ -934,7 +930,7 @@
     }
 
     // ==========================================
-    // MODAL: ยืนยันการลบประวัติ ( Restore / No Restore )
+    // MODAL: ยืนยันการลบประวัติ
     // ==========================================
     function DeleteLogModal({ isOpen, onClose, logToDelete, onConfirmDelete }) {
       if (!isOpen || !logToDelete) return null;
@@ -942,17 +938,17 @@
       const isRestock = logToDelete.type === 'เติมสต๊อก';
 
       return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 text-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-stone-100 text-center">
             <div className="w-12 h-12 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center mx-auto mb-3">
               <i data-lucide="alert-circle" className="w-6 h-6"></i>
             </div>
-            <h3 className="font-bold text-base text-slate-800 mb-1">ยืนยันการลบประวัติรายการ</h3>
-            <p className="text-xs text-slate-500 mb-4 font-medium">"{logToDelete.title}"</p>
+            <h3 className="font-bold text-base text-stone-800 mb-1">ยืนยันการลบประวัติรายการ</h3>
+            <p className="text-xs text-stone-500 mb-4 font-medium">"{logToDelete.title}"</p>
 
             <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3 text-left mb-5">
-              <p className="text-xs text-amber-800 font-semibold mb-1">คุณต้องการปรับคืนค่าสต๊อกวัตถุดิบเดิมหรือไม่?</p>
-              <p className="text-[11px] text-amber-700/80">
+              <p className="text-xs text-amber-900 font-semibold mb-1">คุณต้องการปรับคืนค่าสต๊อกวัตถุดิบเดิมหรือไม่?</p>
+              <p className="text-[11px] text-amber-800/80">
                 • <b>คืนค่าสต๊อก:</b> {isRestock ? 'หักวัตถุดิบที่เคยเติมใส่ออกไปจากคลัง' : 'ดึงวัตถุดิบที่ถูกตัดไปคืนกลับเข้าคลังสต๊อก'}<br/>
                 • <b>ไม่คืนค่าสต๊อก:</b> ลบเฉพาะประวัติข้อความออกเพียงอย่างเดียว
               </p>
@@ -962,7 +958,7 @@
               <button
                 type="button"
                 onClick={() => onConfirmDelete(true)}
-                className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl transition shadow-md"
+                className="w-full py-3 bg-amber-800 hover:bg-amber-900 text-white font-bold text-xs sm:text-sm rounded-xl transition shadow-md"
               >
                 🔄 คืนค่าสต๊อกเดิม & ลบประวัติ
               </button>
@@ -976,7 +972,7 @@
               <button
                 type="button"
                 onClick={onClose}
-                className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs rounded-xl transition mt-1"
+                className="w-full py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-600 font-bold text-xs rounded-xl transition mt-1"
               >
                 ยกเลิก
               </button>
@@ -987,7 +983,7 @@
     }
 
     // ==========================================
-    // 4. MODAL: สรุปรายงานประจำวัน (มุมมอง A4)
+    // MODAL: สรุปรายงานประจำวัน (A4)
     // ==========================================
     function PrintSummaryModal({ isOpen, onClose, logs, lowStockItems }) {
       if (!isOpen) return null;
@@ -1003,15 +999,15 @@
         return l.datetime.includes(`${d}/${m}/${y}`);
       });
 
-      const productionLogs = todayLogs.filter(l => l.type === 'ปรุงผลิต' || l.type === 'ต้มผลิต');
+      const productionLogs = todayLogs.filter(l => l.type === 'สั่งปรุง/ขาย' || l.type === 'ปรุงผลิต');
       let totalBuckets = 0;
       const recipeSummary = {};
 
       productionLogs.forEach(l => {
         if (l.title) {
-          const items = l.title.replace(/^(ปรุง|ต้ม)\s+/, '').split(', ');
+          const items = l.title.replace(/^(สั่งปรุง\/ขาย|ปรุง|ต้ม)\s+/, '').split(', ');
           items.forEach(item => {
-            const match = item.match(/(.+) \((\d+) (ถัง|หม้อ)\)/);
+            const match = item.match(/(.+) \((\d+) (ถัง|แก้ว|หม้อ)\)/);
             if (match) {
               const name = match[1].trim();
               const count = parseInt(match[2], 10);
@@ -1027,61 +1023,57 @@
       const handlePrint = () => { window.print(); };
 
       return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-900/75 backdrop-blur-md animate-fade-in overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-stone-900/75 backdrop-blur-md animate-fade-in overflow-y-auto">
           <div className="flex flex-col items-center w-full max-w-2xl my-auto">
             
-            {/* กล่องกระดาษจำลอง A4 */}
-            <div id="printable-report" className="a4-container rounded-2xl sm:rounded-3xl p-5 sm:p-8 text-slate-800 flex flex-col justify-between border border-slate-200">
+            <div id="printable-report" className="a4-container rounded-2xl sm:rounded-3xl p-5 sm:p-8 text-stone-800 flex flex-col justify-between border border-stone-200">
               <div>
-                {/* A4 Header */}
-                <div className="border-b-2 border-slate-900 pb-3 mb-4 flex justify-between items-end">
+                <div className="border-b-2 border-stone-900 pb-3 mb-4 flex justify-between items-end">
                   <div>
-                    <h1 className="text-base sm:text-2xl font-black text-slate-900 tracking-tight">📄 รายงานสรุปประจำวัน </h1>
-                    <p className="text-[11px] sm:text-xs font-semibold text-slate-600 mt-0.5">ร้านติดใจ | วันที่: {todayStr}</p>
+                    <h1 className="text-base sm:text-2xl font-black text-amber-950 tracking-tight">📄 รายงานสรุปประจำวัน</h1>
+                    <p className="text-[11px] sm:text-xs font-semibold text-stone-600 mt-0.5">ร้านติดใจ | วันที่: {todayStr}</p>
                   </div>
-                  <div className="text-right text-[10px] sm:text-xs text-slate-400 font-mono">
+                  <div className="text-right text-[10px] sm:text-xs text-stone-400 font-mono">
                     DAILY-REPORT
                   </div>
                 </div>
 
-                {/* 1. สรุปการปรุง/ต้ม */}
-                <div className="mb-4 bg-emerald-50/60 p-3 sm:p-4 rounded-xl border border-emerald-200">
+                <div className="mb-4 bg-amber-50/60 p-3 sm:p-4 rounded-xl border border-amber-200">
                   <div className="flex justify-between items-center mb-2">
-                    <h3 className="font-bold text-slate-800 text-xs sm:text-sm flex items-center gap-1.5">
-                      🪣 สรุปการปรุง/ต้มประจำวัน
+                    <h3 className="font-bold text-amber-950 text-xs sm:text-sm flex items-center gap-1.5">
+                      🧋 สรุปการสั่งปรุง / ขายประจำวัน
                     </h3>
-                    <span className="text-[10px] sm:text-xs font-extrabold bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full">
-                      รวม {totalBuckets} ถัง
+                    <span className="text-[10px] sm:text-xs font-extrabold bg-amber-200/60 text-amber-900 px-2.5 py-0.5 rounded-full">
+                      รวม {totalBuckets} รายการ
                     </span>
                   </div>
 
                   {Object.keys(recipeSummary).length === 0 ? (
-                    <div className="text-[11px] text-slate-400 italic">ยังไม่มีบันทึกการปรุงในวันนี้</div>
+                    <div className="text-[11px] text-stone-400 italic">ยังไม่มีบันทึกการปรุง/ขายในวันนี้</div>
                   ) : (
                     <div className="grid grid-cols-2 gap-1.5 text-[11px] sm:text-xs">
                       {Object.entries(recipeSummary).map(([name, count]) => (
-                        <div key={name} className="bg-white px-2.5 py-1.5 rounded-lg border border-slate-200 flex justify-between items-center">
-                          <span className="font-medium text-slate-700 truncate">{name}</span>
-                          <span className="font-bold text-emerald-600 ml-1 whitespace-nowrap">{count} ถัง</span>
+                        <div key={name} className="bg-white px-2.5 py-1.5 rounded-lg border border-stone-200 flex justify-between items-center">
+                          <span className="font-medium text-stone-700 truncate">{name}</span>
+                          <span className="font-bold text-amber-800 ml-1 whitespace-nowrap">{count} หน่วย</span>
                         </div>
                       ))}
                     </div>
                   )}
                 </div>
 
-                {/* 2. เตือนวัตถุดิบใกล้หมด */}
                 <div className="mb-4 bg-rose-50/60 p-3 sm:p-4 rounded-xl border border-rose-200">
                   <h3 className="font-bold text-rose-800 text-xs sm:text-sm mb-2 flex items-center gap-1.5">
                     ⚠️ วัตถุดิบใกล้หมด / ต้องสั่งซื้อเพิ่ม ({lowStockItems.length} รายการ)
                   </h3>
 
                   {lowStockItems.length === 0 ? (
-                    <div className="text-[11px] text-slate-500 italic">ไม่มีวัตถุดิบใกล้หมด สต๊อกอยู่ในเกณฑ์ปกติ</div>
+                    <div className="text-[11px] text-stone-500 italic">ไม่มีวัตถุดิบใกล้หมด สต๊อกอยู่ในเกณฑ์ปกติ</div>
                   ) : (
                     <div className="grid grid-cols-2 gap-1.5 text-[11px] sm:text-xs">
                       {lowStockItems.map(s => (
                         <div key={s.id} className="bg-white px-2.5 py-1.5 rounded-lg border border-rose-200 flex justify-between items-center">
-                          <span className="font-medium text-slate-800 truncate">{s.name}</span>
+                          <span className="font-medium text-stone-800 truncate">{s.name}</span>
                           <span className="font-bold text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded ml-1 whitespace-nowrap">
                             เหลือ {s.current} {s.unit}
                           </span>
@@ -1091,20 +1083,19 @@
                   )}
                 </div>
 
-                {/* 3. สรุปการเอาของออกไปหน้าร้าน */}
-                <div className="mb-2 bg-amber-50/60 p-3 sm:p-4 rounded-xl border border-amber-200">
-                  <h3 className="font-bold text-amber-900 text-xs sm:text-sm mb-2 flex items-center gap-1.5">
+                <div className="mb-2 bg-stone-50/80 p-3 sm:p-4 rounded-xl border border-stone-200">
+                  <h3 className="font-bold text-stone-800 text-xs sm:text-sm mb-2 flex items-center gap-1.5">
                     📤 สรุปการเอาของออกไปหน้าร้านวันนี้
                   </h3>
 
                   {transferLogs.length === 0 ? (
-                    <div className="text-[11px] text-slate-500 italic">ไม่มีรายการเอาของออกไปหน้าร้านในวันนี้</div>
+                    <div className="text-[11px] text-stone-500 italic">ไม่มีรายการเอาของออกไปหน้าร้านในวันนี้</div>
                   ) : (
                     <div className="space-y-1.5 text-[11px] sm:text-xs">
                       {transferLogs.map(l => (
-                        <div key={l.id} className="bg-white px-2.5 py-1.5 rounded-lg border border-amber-200 flex justify-between items-center">
-                          <span className="font-medium text-slate-800 truncate">{l.title}</span>
-                          <span className="text-slate-400 text-[9px] sm:text-[10px] ml-2 whitespace-nowrap">{l.datetime}</span>
+                        <div key={l.id} className="bg-white px-2.5 py-1.5 rounded-lg border border-stone-200 flex justify-between items-center">
+                          <span className="font-medium text-stone-800 truncate">{l.title}</span>
+                          <span className="text-stone-400 text-[9px] sm:text-[10px] ml-2 whitespace-nowrap">{l.datetime}</span>
                         </div>
                       ))}
                     </div>
@@ -1112,19 +1103,17 @@
                 </div>
               </div>
 
-              {/* A4 Footer Signatures */}
-              <div className="pt-6 mt-6 border-t border-slate-200 grid grid-cols-2 text-center text-[10px] text-slate-400">
+              <div className="pt-6 mt-6 border-t border-stone-200 grid grid-cols-2 text-center text-[10px] text-stone-400">
                 <div>ลงชื่อผู้รายงาน: ............................................</div>
                 <div>ลงชื่อผู้รับเรื่อง: ............................................</div>
               </div>
             </div>
 
-            {/* Floating Action Bar */}
             <div className="w-full max-w-2xl pt-3 flex gap-2.5 no-print">
-              <button type="button" onClick={onClose} className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs sm:text-sm rounded-2xl transition shadow-lg">
+              <button type="button" onClick={onClose} className="flex-1 py-3 bg-stone-800 hover:bg-stone-700 text-white font-bold text-xs sm:text-sm rounded-2xl transition shadow-lg">
                 ปิดหน้าต่าง
               </button>
-              <button type="button" onClick={handlePrint} className="flex-1 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-lg shadow-emerald-500/30 transition flex items-center justify-center gap-2">
+              <button type="button" onClick={handlePrint} className="flex-1 py-3 bg-amber-700 hover:bg-amber-800 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-lg shadow-amber-700/30 transition flex items-center justify-center gap-2">
                 <i data-lucide="printer" className="w-4 h-4"></i> พิมพ์ / สั่งพิมพ์ PDF
               </button>
             </div>
@@ -1135,11 +1124,12 @@
     }
 
     // ==========================================
-    // 5. MODAL: เพิ่ม/แก้ไข สูตรเครื่องดื่ม/น้ำปรุง (BOM Modal)
+    // MODAL: เพิ่ม/แก้ไข สูตรเครื่องดื่ม/น้ำปรุง (BOM Modal)
     // ==========================================
     function RecipeModal({ isOpen, onClose, onSave, editingRecipe, stocks, handleImageUpload }) {
       const [name, setName] = useState('');
       const [yieldInfo, setYieldInfo] = useState('1 ถัง');
+      const [price, setPrice] = useState(35); // เพิ่มราคาขาย
       const [image, setImage] = useState('');
       const [ingredients, setIngredients] = useState([]);
 
@@ -1147,11 +1137,13 @@
         if (editingRecipe) {
           setName(editingRecipe.name || '');
           setYieldInfo(editingRecipe.yieldInfo || '1 ถัง');
+          setPrice(editingRecipe.price !== undefined ? editingRecipe.price : 35);
           setImage(editingRecipe.image || '');
           setIngredients(editingRecipe.ingredients || []);
         } else {
           setName('');
           setYieldInfo('1 ถัง');
+          setPrice(35);
           setImage('');
           setIngredients([]);
         }
@@ -1188,7 +1180,7 @@
 
       const handleSubmit = (e) => {
         e.preventDefault();
-        if (!name) return alert('กรุณาระบุชื่อสูตรน้ำปรุง');
+        if (!name) return alert('กรุณาระบุชื่อสูตร/เมนู');
         if (ingredients.length === 0) return alert('กรุณาเพิ่มส่วนผสมอย่างน้อย 1 รายการ');
 
         for (let ing of ingredients) {
@@ -1201,6 +1193,7 @@
           id: editingRecipe ? editingRecipe.id : undefined,
           name,
           yieldInfo,
+          price: Number(price),
           image,
           ingredients: ingredients.map(i => ({ 
             stockId: i.stockId, 
@@ -1211,54 +1204,61 @@
       };
 
       return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 max-h-[90vh] flex flex-col justify-between">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-stone-100 max-h-[90vh] flex flex-col justify-between">
             <div className="overflow-y-auto pr-1">
-              <div className="flex justify-between items-center pb-4 border-b border-slate-100 mb-5">
-                <h3 className="font-bold text-lg text-slate-800 flex items-center gap-2">
-                  <i data-lucide={editingRecipe ? "edit-3" : "book-open"} className="w-5 h-5 text-emerald-600"></i>
-                  {editingRecipe ? 'แก้ไขสูตรน้ำปรุง' : 'เพิ่มสูตรน้ำปรุงใหม่ (BOM)'}
+              <div className="flex justify-between items-center pb-4 border-b border-stone-100 mb-5">
+                <h3 className="font-bold text-lg text-amber-900 flex items-center gap-2">
+                  <i data-lucide={editingRecipe ? "edit-3" : "book-open"} className="w-5 h-5 text-amber-700"></i>
+                  {editingRecipe ? 'แก้ไขสูตร & ราคาขาย' : 'เพิ่มสูตรเมนูใหม่ (BOM)'}
                 </h3>
-                <button onClick={onClose} className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition">
+                <button onClick={onClose} className="p-1 rounded-lg text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition">
                   <i data-lucide="x" className="w-5 h-5"></i>
                 </button>
               </div>
 
               <form id="recipeForm" onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">ชื่อสูตร / น้ำปรุง <span className="text-rose-500">*</span></label>
-                  <input type="text" placeholder="เช่น น้ำปรุงรสสูตร 1" value={name} onChange={e => setName(e.target.value)} required className="w-full px-4 py-3 text-sm rounded-xl custom-input" />
+                  <label className="block text-xs font-semibold text-stone-600 mb-1">ชื่อสูตร / เมนูเครื่องดื่ม <span className="text-rose-500">*</span></label>
+                  <input type="text" placeholder="เช่น ชานมไต้หวัน / ชาไทยเข้มข้น" value={name} onChange={e => setName(e.target.value)} required className="w-full px-4 py-3 text-sm rounded-xl custom-input" />
                 </div>
 
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">ปริมาณที่ได้ต่อ 1 บัตช์ / ถัง</label>
-                  <input type="text" placeholder="เช่น 1 ถัง" value={yieldInfo} onChange={e => setYieldInfo(e.target.value)} className="w-full px-4 py-2.5 text-sm rounded-xl custom-input" />
-                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-stone-600 mb-1">ราคาขายต่อหน่วย (บาท) <span className="text-rose-500">*</span></label>
+                    <input type="number" min="0" placeholder="35" value={price} onChange={e => setPrice(e.target.value)} required className="w-full px-4 py-2.5 text-sm rounded-xl custom-input font-bold text-amber-800" />
+                  </div>
 
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">รูปภาพประกอบ</label>
-                  <div className="flex items-center space-x-3">
-                    <img src={image || DEFAULT_IMAGE} className="w-12 h-12 rounded-xl object-cover border border-slate-200" alt="พรีวิวสูตร" />
-                    <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, (base64) => setImage(base64))} className="text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100" />
+                  <div>
+                    <label className="block text-xs font-semibold text-stone-600 mb-1">ปริมาณเรียกผลิต</label>
+                    <input type="text" placeholder="เช่น 1 แก้ว / 1 ถัง" value={yieldInfo} onChange={e => setYieldInfo(e.target.value)} className="w-full px-4 py-2.5 text-sm rounded-xl custom-input" />
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-slate-100">
+                <div>
+                  <label className="block text-xs font-semibold text-stone-600 mb-1">รูปภาพประกอบ</label>
+                  <div className="flex items-center space-x-3">
+                    <img src={image || DEFAULT_IMAGE} className="w-12 h-12 rounded-xl object-cover border border-stone-200" alt="พรีวิวสูตร" />
+                    <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, (base64) => setImage(base64))} className="text-xs text-stone-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-amber-100 file:text-amber-900 hover:file:bg-amber-200" />
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-stone-100">
                   <div className="flex justify-between items-center mb-3">
-                    <label className="text-xs font-bold text-slate-700">รายการส่วนผสม (ต่อ 1 ถัง) <span className="text-rose-500">*</span></label>
-                    <button type="button" onClick={handleAddIngredient} className="text-xs font-bold text-emerald-600 hover:text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg flex items-center gap-1">
+                    <label className="text-xs font-bold text-stone-700">รายการส่วนผสมที่ใช้ <span className="text-rose-500">*</span></label>
+                    <button type="button" onClick={handleAddIngredient} className="text-xs font-bold text-amber-800 hover:text-amber-900 bg-amber-100/60 px-3 py-1.5 rounded-lg flex items-center gap-1">
                       <i data-lucide="plus" className="w-3.5 h-3.5"></i> เพิ่มวัตถุดิบ
                     </button>
                   </div>
 
                   {ingredients.length === 0 ? (
-                    <div className="text-center py-6 border-2 border-dashed border-slate-200 rounded-2xl text-xs text-slate-400">
+                    <div className="text-center py-6 border-2 border-dashed border-stone-200 rounded-2xl text-xs text-stone-400">
                       ยังไม่มีส่วนผสม กดปุ่ม "+ เพิ่มวัตถุดิบ" ด้านบนเพื่อระบุส่วนผสม
                     </div>
                   ) : (
                     <div className="space-y-3">
                       {ingredients.map((ing, idx) => (
-                        <div key={idx} className="flex items-center space-x-2 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                        <div key={idx} className="flex items-center space-x-2 bg-stone-50 p-2.5 rounded-xl border border-stone-200">
                           <select
                             value={ing.stockId}
                             onChange={(e) => handleIngredientChange(idx, 'stockId', e.target.value)}
@@ -1286,7 +1286,7 @@
                             className="w-16 px-2 py-2 text-xs rounded-lg custom-input text-center"
                           />
 
-                          <button type="button" onClick={() => handleRemoveIngredient(idx)} className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg">
+                          <button type="button" onClick={() => handleRemoveIngredient(idx)} className="p-1.5 text-stone-400 hover:text-rose-600 rounded-lg">
                             <i data-lucide="trash-2" className="w-4 h-4"></i>
                           </button>
                         </div>
@@ -1297,9 +1297,9 @@
               </form>
             </div>
 
-            <div className="pt-4 border-t border-slate-100 flex gap-3 mt-4">
-              <button type="button" onClick={onClose} className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-sm rounded-xl transition">ยกเลิก</button>
-              <button type="submit" form="recipeForm" className="flex-1 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm rounded-xl shadow-lg shadow-emerald-500/20 transition">บันทึกสูตร</button>
+            <div className="pt-4 border-t border-stone-100 flex gap-3 mt-4">
+              <button type="button" onClick={onClose} className="flex-1 py-3 bg-stone-100 hover:bg-stone-200 text-stone-600 font-bold text-sm rounded-xl transition">ยกเลิก</button>
+              <button type="submit" form="recipeForm" className="flex-1 py-3 bg-amber-700 hover:bg-amber-800 text-white font-bold text-sm rounded-xl shadow-lg shadow-amber-700/20 transition">บันทึกสูตร & ราคา</button>
             </div>
           </div>
         </div>
@@ -1310,7 +1310,7 @@
     // MAIN APP COMPONENT
     // ==========================================
     function App() {
-      const [activeTab, setActiveTab] = useState('sales'); // แท็บเริ่มต้นเปลี่ยนเป็น 'sales'
+      const [activeTab, setActiveTab] = useState('production'); // หน้าหลักเปลี่ยนเป็น 'สั่งปรุง/ขาย'
       const [isBomUnlocked, setIsBomUnlocked] = useState(false);
 
       const [stocks, setStocks] = useState([]);
@@ -1327,12 +1327,6 @@
       const [searchRecipe, setSearchRecipe] = useState('');
       const [searchHistory, setSearchHistory] = useState('');
       const [searchMovement, setSearchMovement] = useState('');
-
-      // Sales Input State
-      const [selectedRecipeForSale, setSelectedRecipeForSale] = useState('');
-      const [cupsSold, setCupsSold] = useState(1);
-      const [pricePerCup, setPricePerCup] = useState(35);
-      const [saleNote, setSaleNote] = useState('');
 
       // Month Filter State for Sales Summary
       const [selectedMonth, setSelectedMonth] = useState(() => {
@@ -1376,7 +1370,7 @@
         const unsubCategories = db.collection('categories').onSnapshot(snapshot => {
           const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
           if (data.length === 0) {
-            const defaults = ['น้ำปรุงรส', 'น้ำซุป', 'วัตถุดิบหลัก', 'บรรจุภัณฑ์'];
+            const defaults = ['น้ำปรุงรส', 'ชา/กาแฟ', 'วัตถุดิบหลัก', 'ท็อปปิ้ง', 'บรรจุภัณฑ์'];
             defaults.forEach(cat => db.collection('categories').add({ name: cat }));
           } else {
             setCategories(data);
@@ -1440,49 +1434,6 @@
           }
         } else {
           setActiveTab(tabName);
-        }
-      };
-
-      // --- Record Sales Handler ---
-      const handleRecordSale = async (e) => {
-        e.preventDefault();
-        if (!selectedRecipeForSale) return alert('กรุณาเลือกเมนูเครื่องดื่ม');
-        if (cupsSold <= 0) return alert('กรุณาระบุจำนวนแก้วให้ถูกต้อง');
-        if (pricePerCup <= 0) return alert('กรุณาระบุราคาต่อแก้ว');
-
-        const recipe = recipes.find(r => r.id === selectedRecipeForSale);
-        const totalAmount = cupsSold * pricePerCup;
-
-        try {
-          const now = new Date();
-          const day = now.getDate().toString().padStart(2, '0');
-          const month = (now.getMonth() + 1).toString().padStart(2, '0');
-          const year = now.getFullYear();
-          const yearTH = year + 543;
-          const hours = now.getHours().toString().padStart(2, '0');
-          const mins = now.getMinutes().toString().padStart(2, '0');
-          const timeStr = `${day}/${month}/${yearTH} ${hours}:${mins} น.`;
-          const dateISO = `${year}-${month}-${day}`;
-
-          await db.collection('sales').add({
-            recipeId: selectedRecipeForSale,
-            menuName: recipe ? recipe.name : 'เครื่องดื่ม',
-            cups: Number(cupsSold),
-            pricePerCup: Number(pricePerCup),
-            totalAmount: Number(totalAmount),
-            note: saleNote || '',
-            datetime: timeStr,
-            dateISO: dateISO,
-            monthKey: `${year}-${month}`,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-          });
-
-          alert(`บันทึกการขายเรียบร้อย! รวมเป็นเงิน ${totalAmount.toLocaleString()} บาท`);
-          setCupsSold(1);
-          setSaleNote('');
-        } catch (err) {
-          console.error(err);
-          alert('เกิดข้อผิดพลาดในการบันทึกยอดขาย');
         }
       };
 
@@ -1562,9 +1513,8 @@
         return recipes.filter(r => r.name.toLowerCase().includes(searchRecipe.toLowerCase()));
       }, [recipes, searchRecipe]);
 
-      // ดึงเฉพาะประวัติที่เป็น "ปรุงผลิต" หรือ "ต้มผลิต" สำหรับแท็บบันทึกการผลิต
       const filteredLogs = useMemo(() => {
-        const prodLogs = logs.filter(l => l.type === 'ปรุงผลิต' || l.type === 'ต้มผลิต');
+        const prodLogs = logs.filter(l => l.type === 'สั่งปรุง/ขาย' || l.type === 'ปรุงผลิต');
         return prodLogs.filter(l => 
           (l.title && l.title.toLowerCase().includes(searchHistory.toLowerCase())) ||
           (l.type && l.type.toLowerCase().includes(searchHistory.toLowerCase())) ||
@@ -1573,7 +1523,6 @@
         );
       }, [logs, searchHistory]);
 
-      // ดึงรายการเฉพาะ วัตถุดิบเข้า-ออก (เติมสต๊อก / เอาของออก)
       const filteredMovements = useMemo(() => {
         const movementLogs = logs.filter(l => l.type === 'เติมสต๊อก' || l.type === 'เอาของออกไปหน้าร้าน' || l.type === 'ย้ายไปหน้าร้าน');
         return movementLogs.filter(l =>
@@ -1605,7 +1554,7 @@
         }
       };
 
-      // --- Production Handlers ---
+      // --- Production & Instant Checkout Handlers ---
       const handleQuantityChange = (recipeId, delta) => {
         setBatchQuantities(prev => {
           const current = prev[recipeId] || 0;
@@ -1632,28 +1581,36 @@
           .filter(([_, qty]) => qty > 0)
           .map(([recipeId, qty]) => {
             const recipe = recipes.find(r => r.id === recipeId);
+            const unitPrice = recipe ? (recipe.price || 35) : 35;
             return {
               recipeId,
-              name: recipe ? recipe.name : 'สูตรน้ำปรุง',
+              name: recipe ? recipe.name : 'เครื่องดื่ม',
               qty,
+              price: unitPrice,
+              totalPrice: unitPrice * qty,
               yieldInfo: recipe ? recipe.yieldInfo : '',
               recipe
             };
           });
       }, [batchQuantities, recipes]);
 
-      // จำนวนถังรวมทั้งหมดที่ถูกเลือก
       const totalBucketsCount = useMemo(() => {
         return selectedProductionList.reduce((acc, curr) => acc + curr.qty, 0);
       }, [selectedProductionList]);
 
-      const handleConfirmProduction = async () => {
-        if (selectedProductionList.length === 0) return alert('กรุณาเลือกจำนวนถังอย่างน้อย 1 รายการ');
+      const grandTotalPrice = useMemo(() => {
+        return selectedProductionList.reduce((acc, curr) => acc + curr.totalPrice, 0);
+      }, [selectedProductionList]);
+
+      // ฟังก์ชันควบรวม: ยืนยันการปรุง + คิดเงิน + ตัดสต๊อก + บันทึกยอดขาย
+      const handleConfirmProductionAndCheckout = async () => {
+        if (selectedProductionList.length === 0) return alert('กรุณาเลือกรายการปรุง/เครื่องดื่มอย่างน้อย 1 รายการ');
 
         try {
           const batch = db.batch();
           const deductionsSummary = {};
 
+          // 1. คำนวณตัดสต๊อกวัตถุดิบ
           selectedProductionList.forEach(item => {
             if (item.recipe && item.recipe.ingredients) {
               item.recipe.ingredients.forEach(ing => {
@@ -1667,6 +1624,7 @@
             }
           });
 
+          // 2. ตัดสต๊อกวัตถุดิบในคลัง
           Object.entries(deductionsSummary).forEach(([stockId, deductAmount]) => {
             const stockRef = db.collection('stocks').doc(stockId);
             batch.update(stockRef, {
@@ -1674,7 +1632,7 @@
             });
           });
 
-          const titleText = selectedProductionList.map(item => `${item.name} (${item.qty} ถัง)`).join(', ');
+          const titleText = selectedProductionList.map(item => `${item.name} (${item.qty} ${item.yieldInfo || 'หน่วย'})`).join(', ');
           
           const detailsList = Object.entries(deductionsSummary).map(([stockId, deductAmount]) => {
             const stockItem = stocks.find(s => s.id === stockId);
@@ -1684,28 +1642,49 @@
           const now = new Date();
           const day = now.getDate().toString().padStart(2, '0');
           const month = (now.getMonth() + 1).toString().padStart(2, '0');
-          const year = now.getFullYear() + 543;
+          const year = now.getFullYear();
+          const yearTH = year + 543;
           const hours = now.getHours().toString().padStart(2, '0');
           const mins = now.getMinutes().toString().padStart(2, '0');
-          const timeStr = `${day}/${month}/${year} ${hours}:${mins} น.`;
+          const timeStr = `${day}/${month}/${yearTH} ${hours}:${mins} น.`;
+          const dateISO = `${year}-${month}-${day}`;
 
+          // 3. บันทึกประวัติลง Logs
           const logRef = db.collection('logs').doc();
           batch.set(logRef, {
             datetime: timeStr,
             timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-            type: 'ปรุงผลิต',
-            title: `ปรุง ${titleText}`,
+            type: 'สั่งปรุง/ขาย',
+            title: `สั่งปรุง/ขาย ${titleText}`,
             details: detailsList,
             rawDeductions: deductionsSummary,
-            note: productionNote || 'ปรุงผลิตประจำวัน'
+            totalAmount: grandTotalPrice,
+            note: productionNote || 'สั่งปรุงและคิดเงินหน้าร้าน'
+          });
+
+          // 4. บันทึกลงระบบยอดขาย (Sales Collection) แยกทีละรายการ
+          selectedProductionList.forEach(item => {
+            const saleRef = db.collection('sales').doc();
+            batch.set(saleRef, {
+              recipeId: item.recipeId,
+              menuName: item.name,
+              cups: Number(item.qty),
+              pricePerCup: Number(item.price),
+              totalAmount: Number(item.totalPrice),
+              note: productionNote || '',
+              datetime: timeStr,
+              dateISO: dateISO,
+              monthKey: `${year}-${month}`,
+              timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
           });
 
           await batch.commit();
-          alert('บันทึกการผลิตและตัดสต๊อกเรียบร้อยแล้ว!');
+          alert(`✅ บันทึกสั่งปรุง คิดเงิน (${grandTotalPrice.toLocaleString()} ฿) และตัดสต๊อกเรียบร้อยแล้ว!`);
           setBatchQuantities({});
           setProductionNote('');
         } catch (error) {
-          console.error("Error confirming production:", error);
+          console.error("Error confirming production and checkout:", error);
           alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
         }
       };
@@ -1718,7 +1697,6 @@
           const oldMap = isRestock ? logItem.rawRestock : logItem.rawDeductions;
 
           if (oldMap) {
-            // คืนค่าสต๊อกเดิมก่อน
             Object.entries(oldMap).forEach(([sId, oldQty]) => {
               const stockRef = db.collection('stocks').doc(sId);
               batch.update(stockRef, {
@@ -1727,7 +1705,6 @@
             });
           }
 
-          // ปรับสต๊อกตามค่าใหม่
           const newDetailsList = [];
           const newRaw = {};
 
@@ -1765,16 +1742,15 @@
         }
       };
 
-      // --- Save Production Edit (ลบชาไทยออก/ปรับถัง) ---
       const handleSaveProductionEdit = async (logItem, updatedItemsMap, newNote) => {
         try {
           const titleText = Object.entries(updatedItemsMap)
-            .map(([name, qty]) => `${name} (${qty} ถัง)`)
+            .map(([name, qty]) => `${name} (${qty} หน่วย)`)
             .join(', ');
 
           const logRef = db.collection('logs').doc(logItem.id);
           await logRef.update({
-            title: titleText ? `ปรุง ${titleText}` : 'ยกเลิกการปรุงผลิต',
+            title: titleText ? `สั่งปรุง/ขาย ${titleText}` : 'ยกเลิกรายการสั่งปรุง',
             note: newNote
           });
 
@@ -1981,28 +1957,28 @@
       return (
         <div className="min-h-screen flex flex-col justify-between">
           <div>
-            {/* Header */}
-            <header className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
-              <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between border-b border-slate-100 sm:border-none">
+            {/* Header - โทนชาไต้หวัน / ชานม */}
+            <header className="bg-white border-b border-amber-200/60 sticky top-0 z-40 shadow-sm">
+              <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between border-b border-stone-100 sm:border-none">
                 <div className="flex items-center space-x-2.5">
-                  <div className="bg-emerald-500 text-white p-2 rounded-xl shadow-md shadow-emerald-500/20">
-                    <i data-lucide="soup" className="w-5 h-5 sm:w-6 sm:h-6"></i>
+                  <div className="bg-amber-800 text-amber-100 p-2 rounded-2xl shadow-md shadow-amber-900/20">
+                    <i data-lucide="cup-soda" className="w-5 h-5 sm:w-6 sm:h-6"></i>
                   </div>
                   <div>
-                    <h1 className="font-bold text-slate-800 text-base sm:text-lg tracking-tight leading-none">ร้านติดใจ</h1>
-                    <p className="text-[10px] text-slate-400 font-medium mt-0.5">ระบบจัดการวัตถุดิบ & เช็คยอดขาย</p>
+                    <h1 className="font-bold text-amber-950 text-base sm:text-lg tracking-tight leading-none">ร้านติดใจ</h1>
+                    <p className="text-[10px] text-amber-800/70 font-semibold mt-0.5">ระบบจัดการสั่งปรุง & สต๊อกชาไข่มุก</p>
                   </div>
                 </div>
 
                 <div className="flex items-center space-x-1.5 sm:space-x-2">
-                  <button onClick={() => setActiveTab('salesSummary')} className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-md transition">
-                    <i data-lucide="trending-up" className="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+                  <button onClick={() => setActiveTab('salesSummary')} className="bg-amber-800 hover:bg-amber-900 text-amber-50 text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-md transition">
+                    <i data-lucide="trending-up" className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-300"></i>
                     <span>ยอดขายวันนี้: {todaySalesSummary.totalMoney.toLocaleString()} ฿</span>
                   </button>
 
-                  <button onClick={() => setPrintModalOpen(true)} className="bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-md transition">
+                  <button onClick={() => setPrintModalOpen(true)} className="bg-stone-800 text-white hover:bg-stone-900 text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 shadow-md transition">
                     <i data-lucide="printer" className="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
-                    <span className="hidden sm:inline">รายงานประจำวัน</span>
+                    <span className="hidden sm:inline">รายงานสรุป</span>
                   </button>
 
                   {lowStockItems.length > 0 && (
@@ -2015,43 +1991,38 @@
               </div>
 
               {/* Navigation Bar */}
-              <div className="bg-slate-100/80 p-1.5 border-t border-slate-200/60">
+              <div className="bg-amber-100/40 p-1.5 border-t border-amber-200/50">
                 <div className="max-w-7xl mx-auto flex space-x-1 overflow-x-auto no-scrollbar justify-start sm:justify-center px-2">
-                  <button onClick={() => handleTabChange('sales')} className={`flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'sales' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>
-                    <i data-lucide="shopping-cart" className="w-4 h-4"></i>
-                    <span>💰 บันทึกยอดขาย</span>
+                  <button onClick={() => handleTabChange('production')} className={`flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'production' ? 'bg-amber-800 text-white shadow-sm' : 'text-stone-600 hover:text-amber-950'}`}>
+                    <i data-lucide="flame" className="w-4 h-4"></i>
+                    <span>🧋 สั่งปรุง & คิดเงิน</span>
                   </button>
 
-                  <button onClick={() => handleTabChange('salesSummary')} className={`flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'salesSummary' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>
+                  <button onClick={() => handleTabChange('salesSummary')} className={`flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'salesSummary' ? 'bg-amber-800 text-white shadow-sm' : 'text-stone-600 hover:text-amber-950'}`}>
                     <i data-lucide="bar-chart-3" className="w-4 h-4"></i>
                     <span>📊 สรุปยอดขาย</span>
                   </button>
 
-                  <button onClick={() => handleTabChange('production')} className={`flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'production' ? 'bg-white text-emerald-600 shadow-sm border border-slate-200' : 'text-slate-600 hover:text-slate-900'}`}>
-                    <i data-lucide="flame" className="w-4 h-4"></i>
-                    <span>สั่งปรุงน้ำปรุง</span>
-                  </button>
-
-                  <button onClick={() => handleTabChange('stock')} className={`flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap relative ${activeTab === 'stock' ? 'bg-white text-emerald-600 shadow-sm border border-slate-200' : 'text-slate-600 hover:text-slate-900'}`}>
+                  <button onClick={() => handleTabChange('stock')} className={`flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap relative ${activeTab === 'stock' ? 'bg-amber-800 text-white shadow-sm' : 'text-stone-600 hover:text-amber-950'}`}>
                     <i data-lucide="boxes" className="w-4 h-4"></i>
-                    <span>คลังวัตถุดิบ</span>
+                    <span>📦 คลังวัตถุดิบ</span>
                     {lowStockItems.length > 0 && <span className="w-2 h-2 rounded-full bg-rose-500"></span>}
                   </button>
 
-                  <button onClick={() => handleTabChange('bom')} className={`flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'bom' ? 'bg-white text-emerald-600 shadow-sm border border-slate-200' : 'text-slate-600 hover:text-slate-900'}`}>
+                  <button onClick={() => handleTabChange('bom')} className={`flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'bom' ? 'bg-amber-800 text-white shadow-sm' : 'text-stone-600 hover:text-amber-950'}`}>
                     <i data-lucide="book-open" className="w-4 h-4"></i>
-                    <span>สูตรการผลิต (BOM)</span>
+                    <span>📖 สูตรการผลิต & ราคา (BOM)</span>
                     {!isBomUnlocked && <span className="text-[10px]">🔒</span>}
                   </button>
 
-                  <button onClick={() => handleTabChange('history')} className={`flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'history' ? 'bg-white text-emerald-600 shadow-sm border border-slate-200' : 'text-slate-600 hover:text-slate-900'}`}>
+                  <button onClick={() => handleTabChange('history')} className={`flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'history' ? 'bg-amber-800 text-white shadow-sm' : 'text-stone-600 hover:text-amber-950'}`}>
                     <i data-lucide="history" className="w-4 h-4"></i>
-                    <span>บันทึกการผลิต</span>
+                    <span>📜 ประวัติสั่งปรุง/ขาย</span>
                   </button>
 
-                  <button onClick={() => handleTabChange('movements')} className={`flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'movements' ? 'bg-white text-emerald-600 shadow-sm border border-slate-200' : 'text-slate-600 hover:text-slate-900'}`}>
+                  <button onClick={() => handleTabChange('movements')} className={`flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'movements' ? 'bg-amber-800 text-white shadow-sm' : 'text-stone-600 hover:text-amber-950'}`}>
                     <i data-lucide="arrow-left-right" className="w-4 h-4"></i>
-                    <span>บันทึกวัตถุดิบ เข้า - ออก</span>
+                    <span>🔄 วัตถุดิบ เข้า-ออก</span>
                   </button>
                 </div>
               </div>
@@ -2061,169 +2032,225 @@
             <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 my-4 sm:my-6">
 
               {loading ? (
-                <div className="text-center py-20 text-slate-400 font-medium text-sm">กำลังโหลดข้อมูลระบบ...</div>
+                <div className="text-center py-20 text-amber-900 font-medium text-sm">กำลังโหลดข้อมูลระบบชาไข่มุก...</div>
               ) : (
                 <>
-                  {/* TAB 0-A: บันทึกยอดขาย (Sales Input) */}
-                  {activeTab === 'sales' && (
-                    <div className="max-w-xl mx-auto bg-white rounded-3xl p-5 sm:p-8 border border-slate-200 custom-shadow">
-                      <div className="mb-6 pb-3 border-b border-slate-100 text-center">
-                        <h2 className="text-xl font-bold text-slate-800 flex items-center justify-center gap-2">
-                          <span>💰</span> บันทึกขายเครื่องดื่มหน้าร้าน
-                        </h2>
-                        <p className="text-xs text-slate-400 mt-1">คีย์ยอดขายรายแก้ว เพื่อให้ระบบคำนวณเงินและสรุปยอดขายอัตโนมัติ</p>
-                      </div>
-
-                      <form onSubmit={handleRecordSale} className="space-y-4">
-                        <div>
-                          <label className="block text-xs font-bold text-slate-700 mb-1">เลือกเมนูเครื่องดื่ม <span className="text-rose-500">*</span></label>
-                          <select
-                            value={selectedRecipeForSale}
-                            onChange={(e) => setSelectedRecipeForSale(e.target.value)}
-                            required
-                            className="w-full px-4 py-3 text-sm rounded-xl custom-input font-bold"
-                          >
-                            <option value="">-- กรุณาเลือกเมนู --</option>
-                            {recipes.map(r => (
-                              <option key={r.id} value={r.id}>{r.name}</option>
-                            ))}
-                          </select>
+                  {/* TAB 1: สั่งปรุง & คิดเงินในตัวเดียว (หน้าหลัก) */}
+                  {activeTab === 'production' && (
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                      <div className="lg:col-span-7 bg-white rounded-3xl p-4 sm:p-8 border border-amber-200/60 custom-shadow">
+                        <div className="mb-4 sm:mb-6">
+                          <h2 className="text-lg sm:text-xl font-bold text-amber-950 flex items-center gap-2">
+                            <span>🧋</span> สั่งปรุง & คิดเงินหน้าร้าน
+                          </h2>
+                          <p className="text-xs text-stone-400 mt-1">กดเลือกเมนูเครื่องดื่มและจำนวนถัง/แก้ว ระบบจะคำนวณเงินและตัดสต๊อกอัตโนมัติ</p>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <label className="block text-xs font-bold text-slate-700 mb-1">จำนวน (แก้ว) <span className="text-rose-500">*</span></label>
-                            <div className="flex items-center">
-                              <button
-                                type="button"
-                                onClick={() => setCupsSold(prev => Math.max(1, prev - 1))}
-                                className="w-10 h-11 bg-slate-100 hover:bg-slate-200 font-bold rounded-l-xl text-slate-700 border border-r-0 border-slate-300"
-                              >
-                                -
-                              </button>
-                              <input
-                                type="number"
-                                min="1"
-                                value={cupsSold}
-                                onChange={(e) => setCupsSold(Math.max(1, parseInt(e.target.value) || 1))}
-                                className="w-full h-11 px-2 text-center text-base font-extrabold custom-input rounded-none"
-                              />
-                              <button
-                                type="button"
-                                onClick={() => setCupsSold(prev => prev + 1)}
-                                className="w-10 h-11 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-r-xl border border-l-0 border-emerald-500"
-                              >
-                                +
-                              </button>
-                            </div>
-                          </div>
-
-                          <div>
-                            <label className="block text-xs font-bold text-slate-700 mb-1">ราคาต่อแก้ว (บาท) <span className="text-rose-500">*</span></label>
-                            <input
-                              type="number"
-                              min="0"
-                              value={pricePerCup}
-                              onChange={(e) => setPricePerCup(Number(e.target.value))}
-                              required
-                              className="w-full h-11 px-4 text-base font-extrabold custom-input text-center text-emerald-600"
-                            />
-                          </div>
-                        </div>
-
-                        {/* ปุ่มตัวเลือกระบุราคาลัด */}
-                        <div className="flex items-center gap-2">
-                          <span className="text-[11px] text-slate-400 font-bold">ราคาด่วน:</span>
-                          {[25, 30, 35, 40, 45, 50].map(p => (
-                            <button
-                              key={p}
-                              type="button"
-                              onClick={() => setPricePerCup(p)}
-                              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition ${pricePerCup === p ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
-                            >
-                              {p}฿
-                            </button>
-                          ))}
-                        </div>
-
-                        {/* แสดงยอดเงินรวม */}
-                        <div className="bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 text-center my-2">
-                          <span className="text-xs font-bold text-emerald-800 uppercase block">ยอดเงินรวมชำระ</span>
-                          <span className="text-3xl font-black text-emerald-600">
-                            {(cupsSold * pricePerCup).toLocaleString()} <span className="text-sm font-normal">บาท</span>
-                          </span>
-                        </div>
-
-                        <div>
-                          <label className="block text-xs font-bold text-slate-700 mb-1">หมายเหตุ (ถ้ามี)</label>
+                        <div className="mb-4 relative">
                           <input
                             type="text"
-                            placeholder="เช่น หวานน้อย / เพิ่มท็อปปิ้ง..."
-                            value={saleNote}
-                            onChange={(e) => setSaleNote(e.target.value)}
-                            className="w-full px-4 py-2.5 text-xs rounded-xl custom-input"
+                            placeholder="ค้นหาชื่อสูตร / เมนูเครื่องดื่ม..."
+                            value={searchProduction}
+                            onChange={(e) => setSearchProduction(e.target.value)}
+                            className="w-full px-4 py-3 text-xs sm:text-sm rounded-xl custom-input pl-10"
                           />
+                          <span className="absolute left-3.5 top-3.5 text-stone-400 text-xs">🔍</span>
+                          {searchProduction && (
+                            <button onClick={() => setSearchProduction('')} className="absolute right-3 top-3 text-stone-400 text-xs hover:text-stone-600 font-bold">✕</button>
+                          )}
                         </div>
 
-                        <button
-                          type="submit"
-                          className="w-full py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-base rounded-2xl shadow-lg shadow-emerald-500/25 transition active:scale-98 flex items-center justify-center gap-2"
-                        >
-                          <i data-lucide="check-circle" className="w-5 h-5"></i> ยืนยันการบันทึกขาย
-                        </button>
-                      </form>
+                        {filteredProductionRecipes.length === 0 ? (
+                          <div className="text-center py-12 text-stone-400 text-sm">ไม่พบสูตรน้ำปรุง/เมนูที่ค้นหา</div>
+                        ) : (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6">
+                            {filteredProductionRecipes.map(recipe => {
+                              const qty = batchQuantities[recipe.id] || 0;
+                              const isSelected = qty > 0;
+                              const price = recipe.price || 35;
+                              return (
+                                <div key={recipe.id} className={`border-2 rounded-2xl p-3.5 sm:p-4 transition-all duration-200 relative flex flex-col justify-between ${isSelected ? 'border-amber-700 bg-amber-50/60' : 'border-amber-100 bg-white hover:border-amber-300'}`}>
+                                  {isSelected && (
+                                    <div className="absolute top-3 right-3 bg-amber-800 text-white rounded-full p-0.5">
+                                      <i data-lucide="check" className="w-3.5 h-3.5"></i>
+                                    </div>
+                                  )}
+
+                                  <div className="flex items-center space-x-3 mb-3">
+                                    <img src={recipe.image || DEFAULT_IMAGE} className="w-14 h-14 rounded-2xl object-cover border border-amber-200 shadow-sm" alt={recipe.name} />
+                                    <div>
+                                      <h3 className="font-bold text-amber-950 text-sm sm:text-base">{recipe.name}</h3>
+                                      <div className="flex items-center gap-2 mt-0.5">
+                                        <span className="text-xs font-black text-amber-800 bg-amber-100 px-2 py-0.5 rounded-lg">{price} ฿</span>
+                                        <span className="text-[11px] text-stone-400">/{recipe.yieldInfo || 'ถัง'}</span>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div className="bg-stone-50 border border-stone-200 rounded-xl p-1 flex items-center justify-between">
+                                    <button 
+                                      onClick={() => handleQuantityChange(recipe.id, -1)} 
+                                      disabled={qty === 0}
+                                      className={`w-10 h-10 rounded-lg font-bold text-lg transition flex items-center justify-center shadow-sm ${qty > 0 ? 'bg-white border border-stone-300 text-stone-700 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 active:scale-95' : 'bg-stone-100 text-stone-300 border border-stone-200 cursor-not-allowed'}`}
+                                    >
+                                      -
+                                    </button>
+                                    <div className="text-center flex-1 px-1">
+                                      <span className="font-bold text-base sm:text-lg text-amber-950">{qty}</span>
+                                      <span className="text-[9px] text-stone-400 block -mt-1 font-medium">หน่วย</span>
+                                    </div>
+                                    <button onClick={() => handleQuantityChange(recipe.id, 1)} className="w-10 h-10 rounded-lg bg-amber-800 font-bold text-lg text-white hover:bg-amber-900 active:scale-95 transition flex items-center justify-center shadow-md shadow-amber-900/20">
+                                      +
+                                    </button>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+
+                        <div className="mt-4">
+                          <label className="block text-xs font-semibold text-stone-600 mb-1.5">หมายเหตุ / ชื่อผู้สั่งซื้อ</label>
+                          <input type="text" placeholder="เช่น หวาน 50% / โต๊ะ 1 / เบิกหน้าร้าน..." value={productionNote} onChange={(e) => setProductionNote(e.target.value)} className="w-full px-4 py-3 text-sm rounded-xl custom-input" />
+                        </div>
+                      </div>
+
+                      {/* สรุปตะกร้าคิดเงิน */}
+                      <div className="lg:col-span-5">
+                        <div className="bg-[#2b1e16] text-white rounded-3xl p-5 sm:p-8 shadow-2xl sticky top-28 border border-amber-900/40">
+                          <div className="flex items-center justify-between pb-4 border-b border-amber-900/60 mb-4 sm:mb-6">
+                            <div className="flex items-center gap-3">
+                              <div className="bg-amber-500/10 p-2 rounded-xl text-amber-400">
+                                <i data-lucide="shopping-bag" className="w-5 h-5 sm:w-6 sm:h-6"></i>
+                              </div>
+                              <div>
+                                <h2 className="font-bold text-base sm:text-lg text-amber-100">สรุปรายการคิดเงิน & ปรุง</h2>
+                                <p className="text-[11px] text-amber-200/60">รายการที่เลือกทั้งหมด</p>
+                              </div>
+                            </div>
+                            {selectedProductionList.length > 0 && (
+                              <button 
+                                onClick={() => setBatchQuantities({})}
+                                className="text-rose-400 hover:text-rose-300 text-xs font-medium bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 px-2.5 py-1.5 rounded-xl transition flex items-center gap-1"
+                              >
+                                <i data-lucide="rotate-ccw" className="w-3.5 h-3.5"></i> รีเซ็ต
+                              </button>
+                            )}
+                          </div>
+
+                          <div className="bg-[#3d2b1f] border border-amber-600/30 rounded-2xl p-3.5 mb-3 flex justify-between items-center text-xs">
+                            <span className="text-amber-200/80 font-semibold">ยอดรวมชำระเงิน:</span>
+                            <span className="text-xl font-black text-amber-400">
+                              {grandTotalPrice.toLocaleString()} <span className="text-xs font-normal text-amber-200">บาท</span>
+                            </span>
+                          </div>
+
+                          <div className="space-y-2.5 min-h-[140px] max-h-[280px] overflow-y-auto pr-1">
+                            {selectedProductionList.length === 0 ? (
+                              <div className="text-center py-10 text-stone-500 text-xs sm:text-sm font-medium">ยังไม่มีรายการที่เลือก<br/><span className="text-[10px] text-stone-600">กดปุ่ม + ด้านซ้ายเพื่อเลือกเครื่องดื่ม</span></div>
+                            ) : (
+                              selectedProductionList.map(item => (
+                                <div key={item.recipeId} className="bg-[#3d2b1f] border border-amber-900/40 rounded-2xl p-3 flex justify-between items-center gap-2">
+                                  <div className="flex items-center space-x-2.5 min-w-0">
+                                    <img src={item.recipe?.image || DEFAULT_IMAGE} className="w-10 h-10 rounded-xl object-cover border border-amber-800 shrink-0" alt={item.name} />
+                                    <div className="min-w-0">
+                                      <div className="font-bold text-xs sm:text-sm text-amber-100 truncate">{item.name}</div>
+                                      <div className="text-[10px] text-amber-300">{item.price} ฿ × {item.qty} = <strong className="text-amber-400">{item.totalPrice} ฿</strong></div>
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center space-x-2 shrink-0">
+                                    <div className="flex items-center bg-[#2b1e16] border border-amber-800/80 rounded-xl p-1">
+                                      <button 
+                                        onClick={() => handleQuantityChange(item.recipeId, -1)}
+                                        className="w-6 h-6 rounded-lg bg-stone-800 text-stone-300 hover:text-white hover:bg-stone-700 text-xs font-bold transition flex items-center justify-center"
+                                      >
+                                        -
+                                      </button>
+                                      <input 
+                                        type="number" 
+                                        value={item.qty} 
+                                        onChange={(e) => handleSetQuantityDirectly(item.recipeId, e.target.value)}
+                                        className="w-10 text-center font-extrabold text-xs text-amber-400 bg-transparent focus:outline-none"
+                                      />
+                                      <button 
+                                        onClick={() => handleQuantityChange(item.recipeId, 1)}
+                                        className="w-6 h-6 rounded-lg bg-amber-700 text-white hover:bg-amber-600 text-xs font-bold transition flex items-center justify-center"
+                                      >
+                                        +
+                                      </button>
+                                    </div>
+                                    <button 
+                                      onClick={() => handleRemoveFromProductionList(item.recipeId)}
+                                      className="p-1.5 text-stone-500 hover:text-rose-400 rounded-lg transition"
+                                      title="ลบรายการนี้"
+                                    >
+                                      <i data-lucide="trash-2" className="w-4 h-4"></i>
+                                    </button>
+                                  </div>
+                                </div>
+                              ))
+                            )}
+                          </div>
+
+                          <button 
+                            onClick={handleConfirmProductionAndCheckout} 
+                            disabled={selectedProductionList.length === 0} 
+                            className={`w-full mt-5 py-4 rounded-2xl font-bold text-sm sm:text-base transition-all duration-200 flex items-center justify-center gap-2 ${selectedProductionList.length > 0 ? 'bg-amber-500 text-amber-950 hover:bg-amber-400 shadow-lg shadow-amber-500/20 active:scale-98' : 'bg-stone-800/60 text-stone-500 cursor-not-allowed'}`}
+                          >
+                            <i data-lucide="check-circle-2" className="w-5 h-5"></i>
+                            ยืนยันสั่งปรุง & คิดเงิน ({grandTotalPrice.toLocaleString()} ฿)
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   )}
 
-                  {/* TAB 0-B: สรุปยอดขาย (Sales Summary) */}
+                  {/* TAB 2: สรุปยอดขาย (Sales Summary) */}
                   {activeTab === 'salesSummary' && (
                     <div className="space-y-6">
-                      {/* สรุปรายวัน */}
-                      <div className="bg-white rounded-3xl p-5 sm:p-8 border border-slate-200 custom-shadow">
-                        <div className="flex justify-between items-center pb-4 border-b border-slate-100 mb-4">
+                      <div className="bg-white rounded-3xl p-5 sm:p-8 border border-amber-200/60 custom-shadow">
+                        <div className="flex justify-between items-center pb-4 border-b border-stone-100 mb-4">
                           <div>
-                            <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                            <h2 className="text-lg font-bold text-amber-950 flex items-center gap-2">
                               <span>📅</span> สรุปยอดขายวันนี้ (รายวัน)
                             </h2>
-                            <p className="text-xs text-slate-400 mt-0.5">ประจำวันที่ {new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                            <p className="text-xs text-stone-400 mt-0.5">ประจำวันที่ {new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                           </div>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                          <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 text-center">
-                            <span className="text-xs font-bold text-emerald-700 block">ยอดขายรวมวันนี้</span>
-                            <span className="text-2xl sm:text-3xl font-black text-emerald-600 mt-1 block">
+                          <div className="bg-amber-50 border border-amber-200/80 rounded-2xl p-4 text-center">
+                            <span className="text-xs font-bold text-amber-800 block">ยอดขายรวมวันนี้</span>
+                            <span className="text-2xl sm:text-3xl font-black text-amber-700 mt-1 block">
                               {todaySalesSummary.totalMoney.toLocaleString()} <span className="text-xs font-normal">บาท</span>
                             </span>
                           </div>
 
-                          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-center">
-                            <span className="text-xs font-bold text-amber-700 block">จำนวนแก้วที่ขายได้</span>
-                            <span className="text-2xl sm:text-3xl font-black text-amber-600 mt-1 block">
-                              {todaySalesSummary.totalCups.toLocaleString()} <span className="text-xs font-normal">แก้ว</span>
+                          <div className="bg-orange-50 border border-orange-200/80 rounded-2xl p-4 text-center">
+                            <span className="text-xs font-bold text-orange-800 block">จำนวนเครื่องดื่มที่ขายได้</span>
+                            <span className="text-2xl sm:text-3xl font-black text-orange-700 mt-1 block">
+                              {todaySalesSummary.totalCups.toLocaleString()} <span className="text-xs font-normal">แก้ว/หน่วย</span>
                             </span>
                           </div>
 
-                          <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-4 text-center">
-                            <span className="text-xs font-bold text-indigo-700 block">จำนวนออเดอร์</span>
-                            <span className="text-2xl sm:text-3xl font-black text-indigo-600 mt-1 block">
+                          <div className="bg-stone-50 border border-stone-200 rounded-2xl p-4 text-center">
+                            <span className="text-xs font-bold text-stone-700 block">จำนวนรายการขาย</span>
+                            <span className="text-2xl sm:text-3xl font-black text-stone-800 mt-1 block">
                               {todaySalesSummary.count} <span className="text-xs font-normal">รายการ</span>
                             </span>
                           </div>
                         </div>
                       </div>
 
-                      {/* สรุปรายเดือน */}
-                      <div className="bg-white rounded-3xl p-5 sm:p-8 border border-slate-200 custom-shadow">
-                        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 pb-4 border-b border-slate-100 mb-4">
+                      <div className="bg-white rounded-3xl p-5 sm:p-8 border border-amber-200/60 custom-shadow">
+                        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 pb-4 border-b border-stone-100 mb-4">
                           <div>
-                            <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                            <h2 className="text-lg font-bold text-amber-950 flex items-center gap-2">
                               <span>📊</span> สรุปยอดขายรายเดือน
                             </h2>
-                            <p className="text-xs text-slate-400 mt-0.5">เลือกเดือนเพื่อดูสถิติการขายและภาพรวมรายได้</p>
+                            <p className="text-xs text-stone-400 mt-0.5">เลือกเดือนเพื่อดูสถิติยอดขายสะสม</p>
                           </div>
 
-                          {/* เลือกเดือน */}
                           <input
                             type="month"
                             value={selectedMonth}
@@ -2233,45 +2260,44 @@
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-                          <div className="bg-slate-900 text-white rounded-2xl p-4 text-center">
-                            <span className="text-xs font-semibold text-slate-400 block">รายได้สะสมประจำเดือน</span>
-                            <span className="text-2xl sm:text-3xl font-black text-emerald-400 mt-1 block">
-                              {monthSalesSummary.totalMoney.toLocaleString()} <span className="text-xs font-normal text-slate-300">บาท</span>
+                          <div className="bg-[#2b1e16] text-white rounded-2xl p-4 text-center">
+                            <span className="text-xs font-semibold text-amber-200/70 block">รายได้สะสมประจำเดือน</span>
+                            <span className="text-2xl sm:text-3xl font-black text-amber-400 mt-1 block">
+                              {monthSalesSummary.totalMoney.toLocaleString()} <span className="text-xs font-normal text-amber-200">บาท</span>
                             </span>
                           </div>
 
-                          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-center">
-                            <span className="text-xs font-bold text-slate-600 block">จำนวนแก้วรวมประจำเดือน</span>
-                            <span className="text-2xl sm:text-3xl font-black text-slate-800 mt-1 block">
+                          <div className="bg-stone-50 border border-stone-200 rounded-2xl p-4 text-center">
+                            <span className="text-xs font-bold text-stone-600 block">จำนวนแก้วรวมประจำเดือน</span>
+                            <span className="text-2xl sm:text-3xl font-black text-stone-800 mt-1 block">
                               {monthSalesSummary.totalCups.toLocaleString()} <span className="text-xs font-normal">แก้ว</span>
                             </span>
                           </div>
 
-                          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-center">
-                            <span className="text-xs font-bold text-slate-600 block">ยอดขายเฉลี่ยต่อวัน</span>
-                            <span className="text-2xl sm:text-3xl font-black text-indigo-600 mt-1 block">
+                          <div className="bg-stone-50 border border-stone-200 rounded-2xl p-4 text-center">
+                            <span className="text-xs font-bold text-stone-600 block">ยอดขายเฉลี่ยต่อวัน</span>
+                            <span className="text-2xl sm:text-3xl font-black text-amber-800 mt-1 block">
                               {monthSalesSummary.avgDailyMoney.toLocaleString()} <span className="text-xs font-normal">บาท/วัน</span>
                             </span>
                           </div>
                         </div>
 
-                        {/* ประวัติการขายในเดือนนี้ */}
                         <div>
-                          <h3 className="font-bold text-sm text-slate-700 mb-3">ประวัติรายการขาย ({monthSalesSummary.monthLogs.length} รายการ)</h3>
+                          <h3 className="font-bold text-sm text-stone-700 mb-3">ประวัติรายการขาย ({monthSalesSummary.monthLogs.length} รายการ)</h3>
                           {monthSalesSummary.monthLogs.length === 0 ? (
-                            <div className="text-center py-8 text-slate-400 text-xs italic">ไม่มีข้อมูลการขายในเดือนนี้</div>
+                            <div className="text-center py-8 text-stone-400 text-xs italic">ไม่มีข้อมูลการขายในเดือนนี้</div>
                           ) : (
                             <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1">
                               {monthSalesSummary.monthLogs.map(log => (
-                                <div key={log.id} className="bg-slate-50 border border-slate-200 p-3 rounded-2xl flex items-center justify-between gap-2 text-xs">
+                                <div key={log.id} className="bg-stone-50 border border-stone-200 p-3 rounded-2xl flex items-center justify-between gap-2 text-xs">
                                   <div>
-                                    <span className="font-bold text-slate-800 text-sm block">{log.menuName}</span>
-                                    <span className="text-slate-400 text-[11px]">{log.datetime} {log.note ? `• ${log.note}` : ''}</span>
+                                    <span className="font-bold text-amber-950 text-sm block">{log.menuName}</span>
+                                    <span className="text-stone-400 text-[11px]">{log.datetime} {log.note ? `• ${log.note}` : ''}</span>
                                   </div>
                                   <div className="flex items-center gap-3">
                                     <div className="text-right">
-                                      <span className="font-black text-emerald-600 text-sm block">+{log.totalAmount} ฿</span>
-                                      <span className="text-[10px] text-slate-500">{log.cups} แก้ว @ {log.pricePerCup}฿</span>
+                                      <span className="font-black text-amber-800 text-sm block">+{log.totalAmount} ฿</span>
+                                      <span className="text-[10px] text-stone-500">{log.cups} หน่วย @ {log.pricePerCup}฿</span>
                                     </div>
                                     <button onClick={() => handleDeleteSale(log.id)} className="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg">
                                       <i data-lucide="trash-2" className="w-4 h-4"></i>
@@ -2286,175 +2312,9 @@
                     </div>
                   )}
 
-                  {/* TAB 1: สั่งปรุงน้ำปรุง */}
-                  {activeTab === 'production' && (
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                      <div className="lg:col-span-7 bg-white rounded-3xl p-4 sm:p-8 border border-slate-200/80 custom-shadow">
-                        <div className="mb-4 sm:mb-6">
-                          <h2 className="text-lg sm:text-xl font-bold text-slate-800 flex items-center gap-2">
-                            <span>📝</span> บันทึกปรุงน้ำรสประจำวัน
-                          </h2>
-                          <p className="text-xs text-slate-400 mt-1">กดเพิ่ม/ลดจำนวนถังที่การ์ดเมนู เพื่อสรุปรายการปรุงอัตโนมัติ</p>
-                        </div>
-
-                        <div className="mb-4 relative">
-                          <input
-                            type="text"
-                            placeholder="ค้นหาชื่อสูตร / เมนูน้ำปรุง..."
-                            value={searchProduction}
-                            onChange={(e) => setSearchProduction(e.target.value)}
-                            className="w-full px-4 py-3 text-xs sm:text-sm rounded-xl custom-input pl-10"
-                          />
-                          <span className="absolute left-3.5 top-3.5 text-slate-400 text-xs">🔍</span>
-                          {searchProduction && (
-                            <button onClick={() => setSearchProduction('')} className="absolute right-3 top-3 text-slate-400 text-xs hover:text-slate-600 font-bold">✕</button>
-                          )}
-                        </div>
-
-                        {filteredProductionRecipes.length === 0 ? (
-                          <div className="text-center py-12 text-slate-400 text-sm">ไม่พบสูตรน้ำปรุงที่ตรงกับการค้นหา</div>
-                        ) : (
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6">
-                            {filteredProductionRecipes.map(recipe => {
-                              const qty = batchQuantities[recipe.id] || 0;
-                              const isSelected = qty > 0;
-                              return (
-                                <div key={recipe.id} className={`border-2 rounded-2xl p-3.5 sm:p-4 transition-all duration-200 relative flex flex-col justify-between ${isSelected ? 'border-emerald-500 bg-emerald-50/20' : 'border-slate-200 bg-white hover:border-slate-300'}`}>
-                                  {isSelected && (
-                                    <div className="absolute top-3 right-3 bg-emerald-500 text-white rounded-full p-0.5">
-                                      <i data-lucide="check" className="w-3.5 h-3.5"></i>
-                                    </div>
-                                  )}
-
-                                  <div className="flex items-center space-x-3 mb-3">
-                                    <img src={recipe.image || DEFAULT_IMAGE} className="w-14 h-14 rounded-2xl object-cover border border-slate-200 shadow-sm" alt={recipe.name} />
-                                    <div>
-                                      <h3 className="font-bold text-slate-800 text-sm sm:text-base">{recipe.name}</h3>
-                                      <p className="text-[11px] text-slate-400">{recipe.yieldInfo || '1 ถัง'}</p>
-                                    </div>
-                                  </div>
-
-                                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-1 flex items-center justify-between">
-                                    <button 
-                                      onClick={() => handleQuantityChange(recipe.id, -1)} 
-                                      disabled={qty === 0}
-                                      className={`w-10 h-10 rounded-lg font-bold text-lg transition flex items-center justify-center shadow-sm ${qty > 0 ? 'bg-white border border-slate-300 text-slate-700 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 active:scale-95' : 'bg-slate-100 text-slate-300 border border-slate-200 cursor-not-allowed'}`}
-                                    >
-                                      -
-                                    </button>
-                                    <div className="text-center flex-1 px-1">
-                                      <span className="font-bold text-base sm:text-lg text-slate-800">{qty}</span>
-                                      <span className="text-[9px] text-slate-400 block -mt-1 font-medium">ถัง</span>
-                                    </div>
-                                    <button onClick={() => handleQuantityChange(recipe.id, 1)} className="w-10 h-10 rounded-lg bg-emerald-500 font-bold text-lg text-white hover:bg-emerald-600 active:scale-95 transition flex items-center justify-center shadow-md shadow-emerald-500/20">
-                                      +
-                                    </button>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
-
-                        <div className="mt-4">
-                          <label className="block text-xs font-semibold text-slate-600 mb-1.5">หมายเหตุ / ผู้ปรุง</label>
-                          <input type="text" placeholder="เช่น ปรุงรอบเช้า / สมชาย..." value={productionNote} onChange={(e) => setProductionNote(e.target.value)} className="w-full px-4 py-3 text-sm rounded-xl custom-input" />
-                        </div>
-                      </div>
-
-                      <div className="lg:col-span-5">
-                        <div className="bg-[#0b1329] text-white rounded-3xl p-5 sm:p-8 shadow-2xl sticky top-28 border border-slate-800">
-                          <div className="flex items-center justify-between pb-4 border-b border-slate-800/80 mb-4 sm:mb-6">
-                            <div className="flex items-center gap-3">
-                              <div className="bg-emerald-500/10 p-2 rounded-xl text-emerald-400">
-                                <i data-lucide="clipboard-list" className="w-5 h-5 sm:w-6 sm:h-6"></i>
-                              </div>
-                              <div>
-                                <h2 className="font-bold text-base sm:text-lg text-white">สรุปรายการผลิตประจำวัน</h2>
-                                <p className="text-[11px] text-slate-400">รายการปรุงที่เลือกในรอบนี้</p>
-                              </div>
-                            </div>
-                            {selectedProductionList.length > 0 && (
-                              <button 
-                                onClick={() => setBatchQuantities({})}
-                                className="text-rose-400 hover:text-rose-300 text-xs font-medium bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 px-2.5 py-1.5 rounded-xl transition flex items-center gap-1"
-                              >
-                                <i data-lucide="rotate-ccw" className="w-3.5 h-3.5"></i> รีเซ็ต
-                              </button>
-                            )}
-                          </div>
-
-                          <div className="bg-[#131c38] border border-emerald-500/30 rounded-2xl p-3 mb-3 flex justify-between items-center text-xs">
-                            <span className="text-slate-300 font-semibold">เลือกแล้วทั้งหมด:</span>
-                            <div className="flex gap-2">
-                              <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold px-2.5 py-1 rounded-xl">
-                                {selectedProductionList.length} รายการ
-                              </span>
-                              <span className="bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold px-2.5 py-1 rounded-xl">
-                                รวม {totalBucketsCount} ถัง
-                              </span>
-                            </div>
-                          </div>
-
-                          <div className="space-y-2.5 min-h-[140px] max-h-[300px] overflow-y-auto pr-1">
-                            {selectedProductionList.length === 0 ? (
-                              <div className="text-center py-10 text-slate-500 text-xs sm:text-sm font-medium">ยังไม่มีรายการที่เลือก<br/><span className="text-[10px] text-slate-600">กดปุ่ม + ด้านซ้ายเพื่อเลือกรายการ</span></div>
-                            ) : (
-                              selectedProductionList.map(item => (
-                                <div key={item.recipeId} className="bg-[#131c38] border border-slate-800/80 rounded-2xl p-3 flex justify-between items-center gap-2">
-                                  <div className="flex items-center space-x-2.5 min-w-0">
-                                    <img src={item.recipe?.image || DEFAULT_IMAGE} className="w-10 h-10 rounded-xl object-cover border border-slate-700 shrink-0" alt={item.name} />
-                                    <div className="min-w-0">
-                                      <div className="font-bold text-xs sm:text-sm text-white truncate">{item.name}</div>
-                                      <div className="text-[10px] text-slate-400">{item.yieldInfo || '1 ถัง'}</div>
-                                    </div>
-                                  </div>
-                                  <div className="flex items-center space-x-2 shrink-0">
-                                    <div className="flex items-center bg-[#0b1329] border border-slate-700 rounded-xl p-1">
-                                      <button 
-                                        onClick={() => handleQuantityChange(item.recipeId, -1)}
-                                        className="w-6 h-6 rounded-lg bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 text-xs font-bold transition flex items-center justify-center"
-                                      >
-                                        -
-                                      </button>
-                                      <input 
-                                        type="number" 
-                                        value={item.qty} 
-                                        onChange={(e) => handleSetQuantityDirectly(item.recipeId, e.target.value)}
-                                        className="w-10 text-center font-extrabold text-xs text-emerald-400 bg-transparent focus:outline-none"
-                                      />
-                                      <button 
-                                        onClick={() => handleQuantityChange(item.recipeId, 1)}
-                                        className="w-6 h-6 rounded-lg bg-emerald-600 text-white hover:bg-emerald-500 text-xs font-bold transition flex items-center justify-center"
-                                      >
-                                        +
-                                      </button>
-                                    </div>
-                                    <button 
-                                      onClick={() => handleRemoveFromProductionList(item.recipeId)}
-                                      className="p-1.5 text-slate-500 hover:text-rose-400 rounded-lg transition"
-                                      title="ลบรายการนี้"
-                                    >
-                                      <i data-lucide="trash-2" className="w-4 h-4"></i>
-                                    </button>
-                                  </div>
-                                </div>
-                              ))
-                            )}
-                          </div>
-
-                          <button onClick={handleConfirmProduction} disabled={selectedProductionList.length === 0} className={`w-full mt-5 py-3.5 sm:py-4 rounded-2xl font-bold text-sm sm:text-base transition-all duration-200 flex items-center justify-center gap-2 ${selectedProductionList.length > 0 ? 'bg-emerald-500 text-slate-950 hover:bg-emerald-400 shadow-lg shadow-emerald-500/20 active:scale-98' : 'bg-slate-800/60 text-slate-500 cursor-not-allowed'}`}>
-                            <i data-lucide="check-circle" className="w-5 h-5"></i>
-                            ยืนยันการปรุง & ตัดสต๊อกทันที
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* TAB 2: คลังวัตถุดิบ */}
+                  {/* TAB 3: คลังวัตถุดิบ */}
                   {activeTab === 'stock' && (
-                    <div className="bg-white rounded-3xl p-3.5 sm:p-8 border border-slate-200/80 custom-shadow">
+                    <div className="bg-white rounded-3xl p-3.5 sm:p-8 border border-amber-200/60 custom-shadow">
                       
                       {lowStockItems.length > 0 && (
                         <div className="mb-5 bg-rose-50 border-2 border-rose-300 rounded-2xl p-3.5 sm:p-5 text-rose-900 shadow-sm">
@@ -2472,7 +2332,7 @@
                               <div key={item.id} className="bg-white p-2 rounded-xl border border-rose-200 flex items-center justify-between">
                                 <div className="flex items-center space-x-1.5 truncate">
                                   <img src={item.image || DEFAULT_IMAGE} className="w-7 h-7 rounded-md object-cover" alt={item.name} />
-                                  <span className="font-bold text-[11px] sm:text-xs text-slate-800 truncate">{item.name}</span>
+                                  <span className="font-bold text-[11px] sm:text-xs text-stone-800 truncate">{item.name}</span>
                                 </div>
                                 <span className="text-[10px] font-bold text-rose-600 bg-rose-100 px-1.5 py-0.5 rounded ml-1 whitespace-nowrap">
                                   {item.current} {item.unit}
@@ -2483,34 +2343,33 @@
                         </div>
                       )}
 
-                      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-4 pb-4 border-b border-slate-100">
+                      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-4 pb-4 border-b border-stone-100">
                         <div>
-                          <h2 className="text-base sm:text-xl font-bold text-slate-800 flex items-center gap-2">
+                          <h2 className="text-base sm:text-xl font-bold text-amber-950 flex items-center gap-2">
                             <span>📦</span> คลังวัตถุดิบคงเหลือ
                           </h2>
-                          <p className="text-[11px] sm:text-xs text-slate-400 mt-0.5">จัดการข้อมูลสต๊อก เติมสต๊อก หรือเอาของออกไปหน้าร้าน</p>
+                          <p className="text-[11px] sm:text-xs text-stone-400 mt-0.5">จัดการสต๊อกชา นม ไข่มุก ไซรัป บรรจุภัณฑ์</p>
                         </div>
                         
                         <div className="flex flex-wrap items-center gap-2">
-                          <button onClick={() => setStockCategorySummaryModalOpen(true)} className="btn-pill bg-indigo-600 hover:bg-indigo-700 text-xs px-3.5 py-2 active:scale-95 shadow-md shadow-indigo-600/30 flex-1 sm:flex-none">
+                          <button onClick={() => setStockCategorySummaryModalOpen(true)} className="btn-pill bg-amber-800 hover:bg-amber-900 text-xs px-3.5 py-2 active:scale-95 shadow-md flex-1 sm:flex-none">
                             <i data-lucide="clipboard-list" className="w-3.5 h-3.5"></i> สรุปตามหมวดหมู่
                           </button>
 
-                          <button onClick={() => setTransferModalOpen(true)} className="btn-pill btn-orange-pill text-xs px-3.5 py-2 active:scale-95 flex-1 sm:flex-none">
+                          <button onClick={() => setTransferModalOpen(true)} className="btn-pill btn-tea text-xs px-3.5 py-2 active:scale-95 flex-1 sm:flex-none">
                             <i data-lucide="upload" className="w-3.5 h-3.5"></i> เอาของออกไปหน้าร้าน
                           </button>
 
-                          <button onClick={() => setRestockModalOpen(true)} className="btn-pill btn-green-pill text-xs px-3.5 py-2 active:scale-95 flex-1 sm:flex-none">
+                          <button onClick={() => setRestockModalOpen(true)} className="btn-pill btn-boba text-xs px-3.5 py-2 active:scale-95 flex-1 sm:flex-none">
                             <i data-lucide="plus-circle" className="w-3.5 h-3.5"></i> เติมสต๊อก
                           </button>
 
-                          <button onClick={() => { setEditingStock(null); setStockModalOpen(true); }} className="btn-pill btn-dark-pill text-xs px-3.5 py-2 active:scale-95 flex-1 sm:flex-none">
+                          <button onClick={() => { setEditingStock(null); setStockModalOpen(true); }} className="btn-pill btn-dark-boba text-xs px-3.5 py-2 active:scale-95 flex-1 sm:flex-none">
                             <i data-lucide="plus" className="w-3.5 h-3.5"></i> เพิ่มวัตถุดิบ
                           </button>
                         </div>
                       </div>
 
-                      {/* Search & Filter Categories */}
                       <div className="flex flex-col sm:flex-row gap-2.5 mb-5">
                         <div className="flex-1 relative">
                           <input
@@ -2520,9 +2379,9 @@
                             onChange={(e) => setSearchStock(e.target.value)}
                             className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl custom-input pl-9"
                           />
-                          <span className="absolute left-3 top-3 text-slate-400 text-xs">🔍</span>
+                          <span className="absolute left-3 top-3 text-stone-400 text-xs">🔍</span>
                           {searchStock && (
-                            <button onClick={() => setSearchStock('')} className="absolute right-3 top-2.5 text-slate-400 text-xs hover:text-slate-600 font-bold">✕</button>
+                            <button onClick={() => setSearchStock('')} className="absolute right-3 top-2.5 text-stone-400 text-xs hover:text-stone-600 font-bold">✕</button>
                           )}
                         </div>
 
@@ -2531,8 +2390,8 @@
                             onClick={() => setSelectedCategory('all')}
                             className={`px-3 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
                               selectedCategory === 'all'
-                                ? 'bg-slate-900 text-white shadow-sm'
-                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                ? 'bg-amber-900 text-white shadow-sm'
+                                : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
                             }`}
                           >
                             ทั้งหมด
@@ -2543,8 +2402,8 @@
                               onClick={() => setSelectedCategory(cat.name)}
                               className={`px-3 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
                                 selectedCategory === cat.name
-                                  ? 'bg-slate-900 text-white shadow-sm'
-                                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                  ? 'bg-amber-900 text-white shadow-sm'
+                                  : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
                               }`}
                             >
                               {cat.name}
@@ -2552,7 +2411,7 @@
                           ))}
                           <button
                             onClick={() => setCategoryModalOpen(true)}
-                            className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold transition"
+                            className="p-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-600 text-xs font-bold transition"
                             title="จัดการหมวดหมู่"
                           >
                             ⚙️
@@ -2560,29 +2419,28 @@
                         </div>
                       </div>
 
-                      {/* Grid Items (แสดง 2 คอลัมน์บนมือถือ) */}
                       {filteredStocks.length === 0 ? (
-                        <div className="text-center py-16 text-slate-400 text-xs sm:text-sm">ไม่พบวัตถุดิบตรงตามเงื่อนไข</div>
+                        <div className="text-center py-16 text-stone-400 text-xs sm:text-sm">ไม่พบวัตถุดิบตรงตามเงื่อนไข</div>
                       ) : (
                         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4">
                           {filteredStocks.map(s => {
                             const isLow = Number(s.current) <= Number(s.minAlert || 0);
                             return (
-                              <div key={s.id} className={`p-3 sm:p-4 rounded-2xl border transition-all duration-200 flex flex-col justify-between relative ${isLow ? 'bg-rose-50/40 border-rose-200 shadow-sm' : 'bg-white border-slate-200 hover:border-slate-300 shadow-sm'}`}>
+                              <div key={s.id} className={`p-3 sm:p-4 rounded-2xl border transition-all duration-200 flex flex-col justify-between relative ${isLow ? 'bg-rose-50/40 border-rose-200 shadow-sm' : 'bg-white border-amber-100 hover:border-amber-300 shadow-sm'}`}>
                                 <div>
                                   <div className="flex items-center space-x-2.5 mb-2.5">
-                                    <img src={s.image || DEFAULT_IMAGE} className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl object-cover border border-slate-200 shrink-0" alt={s.name} />
+                                    <img src={s.image || DEFAULT_IMAGE} className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl object-cover border border-stone-200 shrink-0" alt={s.name} />
                                     <div className="min-w-0 flex-1">
-                                      <h3 className="font-bold text-xs sm:text-sm text-slate-800 truncate" title={s.name}>{s.name}</h3>
-                                      <span className="inline-block text-[9px] sm:text-[10px] bg-slate-100 text-slate-500 font-medium px-2 py-0.5 rounded-full mt-0.5 truncate max-w-full">
+                                      <h3 className="font-bold text-xs sm:text-sm text-amber-950 truncate" title={s.name}>{s.name}</h3>
+                                      <span className="inline-block text-[9px] sm:text-[10px] bg-amber-50 text-amber-800 border border-amber-200/60 font-medium px-2 py-0.5 rounded-full mt-0.5 truncate max-w-full">
                                         {s.category || 'ทั่วไป'}
                                       </span>
                                     </div>
                                   </div>
 
-                                  <div className="my-2 bg-slate-50 p-2 rounded-xl border border-slate-100 text-center">
-                                    <div className={`font-black text-base sm:text-xl ${isLow ? 'text-rose-600' : 'text-slate-800'}`}>
-                                      {s.current} <span className="text-[10px] sm:text-xs font-normal text-slate-400">{s.unit}</span>
+                                  <div className="my-2 bg-stone-50 p-2 rounded-xl border border-stone-100 text-center">
+                                    <div className={`font-black text-base sm:text-xl ${isLow ? 'text-rose-600' : 'text-amber-950'}`}>
+                                      {s.current} <span className="text-[10px] sm:text-xs font-normal text-stone-400">{s.unit}</span>
                                     </div>
                                     {isLow && (
                                       <span className="text-[9px] font-bold text-rose-600 bg-rose-100 px-1.5 py-0.5 rounded-md inline-block mt-1">
@@ -2592,17 +2450,17 @@
                                   </div>
                                 </div>
 
-                                <div className="flex items-center justify-end gap-1 pt-2 border-t border-slate-100 mt-1">
+                                <div className="flex items-center justify-end gap-1 pt-2 border-t border-stone-100 mt-1">
                                   <button
                                     onClick={() => { setEditingStock(s); setStockModalOpen(true); }}
-                                    className="p-1.5 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition"
+                                    className="p-1.5 text-stone-400 hover:text-amber-800 hover:bg-amber-50 rounded-lg transition"
                                     title="แก้ไขข้อมูล"
                                   >
                                     <i data-lucide="edit-3" className="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
                                   </button>
                                   <button
                                     onClick={() => handleDeleteStock(s.id)}
-                                    className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
+                                    className="p-1.5 text-stone-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
                                     title="ลบวัตถุดิบ"
                                   >
                                     <i data-lucide="trash-2" className="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
@@ -2616,62 +2474,67 @@
                     </div>
                   )}
 
-                  {/* TAB 3: สูตรการผลิต (BOM) */}
+                  {/* TAB 4: สูตรการผลิต & กำหนดราคา (BOM) */}
                   {activeTab === 'bom' && (
-                    <div className="bg-white rounded-3xl p-4 sm:p-8 border border-slate-200/80 custom-shadow">
-                      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-6 pb-4 border-b border-slate-100">
+                    <div className="bg-white rounded-3xl p-4 sm:p-8 border border-amber-200/60 custom-shadow">
+                      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-6 pb-4 border-b border-stone-100">
                         <div>
-                          <h2 className="text-lg sm:text-xl font-bold text-slate-800 flex items-center gap-2">
-                            <span>📖</span> จัดการสูตรการผลิต (BOM)
+                          <h2 className="text-lg sm:text-xl font-bold text-amber-950 flex items-center gap-2">
+                            <span>📖</span> จัดการสูตรการผลิต & ราคาขาย (BOM)
                           </h2>
-                          <p className="text-xs text-slate-400 mt-1">ตั้งค่าส่วนผสมของแต่ละเมนู เพื่อตัดสต๊อกอัตโนมัติเมื่อสั่งปรุง</p>
+                          <p className="text-xs text-stone-400 mt-1">ตั้งค่าส่วนผสมและกำหนดราคาขายต่อแก้ว/ถัง เพื่อคำนวณเงินและตัดสต๊อกอัตโนมัติ</p>
                         </div>
                         <button
                           onClick={() => { setEditingRecipe(null); setRecipeModalOpen(true); }}
-                          className="btn-pill btn-dark-pill text-xs px-4 py-2.5 active:scale-95"
+                          className="btn-pill btn-dark-boba text-xs px-4 py-2.5 active:scale-95"
                         >
-                          <i data-lucide="plus" className="w-4 h-4"></i> เพิ่มสูตรใหม่
+                          <i data-lucide="plus" className="w-4 h-4"></i> เพิ่มสูตร & ราคาใหม่
                         </button>
                       </div>
 
                       <div className="mb-5 relative">
                         <input
                           type="text"
-                          placeholder="ค้นหาชื่อสูตร..."
+                          placeholder="ค้นหาชื่อสูตร / เมนู..."
                           value={searchRecipe}
                           onChange={(e) => setSearchRecipe(e.target.value)}
                           className="w-full px-4 py-3 text-xs sm:text-sm rounded-xl custom-input pl-10"
                         />
-                        <span className="absolute left-3.5 top-3.5 text-slate-400 text-xs">🔍</span>
+                        <span className="absolute left-3.5 top-3.5 text-stone-400 text-xs">🔍</span>
                       </div>
 
                       {filteredRecipes.length === 0 ? (
-                        <div className="text-center py-16 text-slate-400 text-xs sm:text-sm">ยังไม่มีสูตรน้ำปรุงในระบบ กดเพิ่มสูตรได้เลย</div>
+                        <div className="text-center py-16 text-stone-400 text-xs sm:text-sm">ยังไม่มีสูตรเครื่องดื่มในระบบ กดเพิ่มสูตรได้เลย</div>
                       ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {filteredRecipes.map(recipe => (
-                            <div key={recipe.id} className="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col justify-between">
+                            <div key={recipe.id} className="bg-amber-50/30 border border-amber-200/60 rounded-2xl p-4 flex flex-col justify-between">
                               <div>
-                                <div className="flex items-center justify-between border-b border-slate-200 pb-3 mb-3">
+                                <div className="flex items-center justify-between border-b border-amber-200/50 pb-3 mb-3">
                                   <div className="flex items-center space-x-3">
                                     <img src={recipe.image || DEFAULT_IMAGE} className="w-12 h-12 rounded-xl object-cover border" alt={recipe.name} />
                                     <div>
-                                      <h3 className="font-bold text-slate-800 text-sm sm:text-base">{recipe.name}</h3>
-                                      <span className="text-[11px] text-slate-400 bg-white border border-slate-200 px-2 py-0.5 rounded-md font-medium">
-                                        ต่อ {recipe.yieldInfo || '1 ถัง'}
-                                      </span>
+                                      <h3 className="font-bold text-amber-950 text-sm sm:text-base">{recipe.name}</h3>
+                                      <div className="flex items-center gap-2 mt-0.5">
+                                        <span className="text-xs font-black text-amber-800 bg-amber-100 px-2 py-0.5 rounded-md">
+                                          ราคา {recipe.price || 35} ฿
+                                        </span>
+                                        <span className="text-[11px] text-stone-400">
+                                          ต่อ {recipe.yieldInfo || 'ถัง'}
+                                        </span>
+                                      </div>
                                     </div>
                                   </div>
                                   <div className="flex items-center space-x-1">
                                     <button
                                       onClick={() => { setEditingRecipe(recipe); setRecipeModalOpen(true); }}
-                                      className="p-1.5 text-slate-400 hover:text-amber-600 hover:bg-white rounded-lg transition"
+                                      className="p-1.5 text-stone-400 hover:text-amber-800 hover:bg-white rounded-lg transition"
                                     >
                                       <i data-lucide="edit-3" className="w-4 h-4"></i>
                                     </button>
                                     <button
                                       onClick={() => handleDeleteRecipe(recipe.id)}
-                                      className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-white rounded-lg transition"
+                                      className="p-1.5 text-stone-400 hover:text-rose-600 hover:bg-white rounded-lg transition"
                                     >
                                       <i data-lucide="trash-2" className="w-4 h-4"></i>
                                     </button>
@@ -2679,14 +2542,14 @@
                                 </div>
 
                                 <div className="space-y-1.5">
-                                  <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">ส่วนผสม:</span>
+                                  <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider">ส่วนผสมที่ใช้:</span>
                                   <div className="grid grid-cols-2 gap-1.5">
                                     {recipe.ingredients && recipe.ingredients.map((ing, idx) => {
                                       const stockItem = stocks.find(s => s.id === ing.stockId);
                                       return (
-                                        <div key={idx} className="bg-white px-2.5 py-1.5 rounded-lg border border-slate-200 flex justify-between items-center text-xs">
-                                          <span className="font-medium text-slate-700 truncate">{stockItem ? stockItem.name : 'วัตถุดิบ'}</span>
-                                          <span className="font-bold text-emerald-600 ml-1 whitespace-nowrap">{ing.amount} {ing.unit || stockItem?.unit}</span>
+                                        <div key={idx} className="bg-white px-2.5 py-1.5 rounded-lg border border-stone-200 flex justify-between items-center text-xs">
+                                          <span className="font-medium text-stone-700 truncate">{stockItem ? stockItem.name : 'วัตถุดิบ'}</span>
+                                          <span className="font-bold text-amber-800 ml-1 whitespace-nowrap">{ing.amount} {ing.unit || stockItem?.unit}</span>
                                         </div>
                                       );
                                     })}
@@ -2700,51 +2563,52 @@
                     </div>
                   )}
 
-                  {/* TAB 4: บันทึกการผลิต */}
+                  {/* TAB 5: ประวัติการสั่งปรุง/ขาย */}
                   {activeTab === 'history' && (
-                    <div className="bg-white rounded-3xl p-4 sm:p-8 border border-slate-200/80 custom-shadow">
-                      <div className="mb-6 pb-4 border-b border-slate-100">
-                        <h2 className="text-lg sm:text-xl font-bold text-slate-800 flex items-center gap-2">
-                          <span>📜</span> ประวัติบันทึกการผลิต
+                    <div className="bg-white rounded-3xl p-4 sm:p-8 border border-amber-200/60 custom-shadow">
+                      <div className="mb-6 pb-4 border-b border-stone-100">
+                        <h2 className="text-lg sm:text-xl font-bold text-amber-950 flex items-center gap-2">
+                          <span>📜</span> ประวัติบันทึกการสั่งปรุง & ขาย
                         </h2>
-                        <p className="text-xs text-slate-400 mt-1">ตรวจสอบประวัติการปรุงน้ำรส ยอดตัดสต๊อก หรือแก้ไข/ลบรายการที่บันทึกผิด</p>
+                        <p className="text-xs text-stone-400 mt-1">ตรวจสอบประวัติการปรุง ยอดตัดสต๊อก หรือแก้ไข/ลบรายการที่บันทึกผิด</p>
                       </div>
 
                       <div className="mb-5 relative">
                         <input
                           type="text"
-                          placeholder="ค้นหาประวัติการผลิต..."
+                          placeholder="ค้นหาประวัติการปรุง/ขาย..."
                           value={searchHistory}
                           onChange={(e) => setSearchHistory(e.target.value)}
                           className="w-full px-4 py-3 text-xs sm:text-sm rounded-xl custom-input pl-10"
                         />
-                        <span className="absolute left-3.5 top-3.5 text-slate-400 text-xs">🔍</span>
+                        <span className="absolute left-3.5 top-3.5 text-stone-400 text-xs">🔍</span>
                       </div>
 
                       {filteredLogs.length === 0 ? (
-                        <div className="text-center py-16 text-slate-400 text-xs sm:text-sm">ยังไม่มีประวัติการสั่งปรุง</div>
+                        <div className="text-center py-16 text-stone-400 text-xs sm:text-sm">ยังไม่มีประวัติการสั่งปรุง</div>
                       ) : (
                         <div className="space-y-3">
                           {filteredLogs.map(log => {
                             const isShowDetails = unlockedLogDetails[log.id];
                             return (
-                              <div key={log.id} className="bg-slate-50 border border-slate-200 p-4 rounded-2xl flex flex-col justify-between gap-3">
-                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/60 pb-2.5">
+                              <div key={log.id} className="bg-amber-50/30 border border-amber-200/50 p-4 rounded-2xl flex flex-col justify-between gap-3">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-200/60 pb-2.5">
                                   <div>
                                     <div className="flex items-center gap-2">
-                                      <span className="bg-emerald-100 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded-md">
-                                        {log.type || 'ปรุงผลิต'}
+                                      <span className="bg-amber-800 text-amber-100 text-[10px] font-bold px-2 py-0.5 rounded-md">
+                                        {log.type || 'สั่งปรุง/ขาย'}
                                       </span>
-                                      <span className="text-[11px] text-slate-400 font-medium">{log.datetime}</span>
+                                      <span className="text-[11px] text-stone-400 font-medium">{log.datetime}</span>
                                     </div>
-                                    <h3 className="font-bold text-sm sm:text-base text-slate-800 mt-1">{log.title}</h3>
-                                    {log.note && <p className="text-xs text-slate-500 italic mt-0.5">หมายเหตุ: {log.note}</p>}
+                                    <h3 className="font-bold text-sm sm:text-base text-amber-950 mt-1">{log.title}</h3>
+                                    {log.totalAmount && <p className="text-xs font-bold text-amber-700 mt-0.5">ยอดรวมเงิน: {log.totalAmount.toLocaleString()} บาท</p>}
+                                    {log.note && <p className="text-xs text-stone-500 italic mt-0.5">หมายเหตุ: {log.note}</p>}
                                   </div>
 
                                   <div className="flex items-center gap-2 self-end sm:self-center">
                                     <button
                                       onClick={() => setProductionToEdit(log)}
-                                      className="text-xs font-bold text-amber-600 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-3 py-1.5 rounded-xl transition flex items-center gap-1"
+                                      className="text-xs font-bold text-amber-800 bg-amber-100/60 hover:bg-amber-100 border border-amber-200 px-3 py-1.5 rounded-xl transition flex items-center gap-1"
                                     >
                                       <i data-lucide="edit-3" className="w-3.5 h-3.5"></i> แก้ไข
                                     </button>
@@ -2761,7 +2625,7 @@
                                   <div className="flex justify-between items-center">
                                     <button
                                       onClick={() => handleToggleShowDetails(log.id)}
-                                      className="text-xs font-bold text-indigo-600 hover:underline flex items-center gap-1"
+                                      className="text-xs font-bold text-amber-800 hover:underline flex items-center gap-1"
                                     >
                                       <i data-lucide={isShowDetails ? "eye-off" : "eye"} className="w-3.5 h-3.5"></i>
                                       {isShowDetails ? 'ซ่อนส่วนผสมที่ถูกตัด' : '🔒 ใส่รหัสเพื่อดูวัตถุดิบที่ตัดสต๊อก'}
@@ -2769,9 +2633,9 @@
                                   </div>
 
                                   {isShowDetails && log.details && (
-                                    <div className="mt-2.5 pt-2.5 border-t border-slate-200 grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+                                    <div className="mt-2.5 pt-2.5 border-t border-stone-200 grid grid-cols-2 sm:grid-cols-3 gap-1.5">
                                       {log.details.map((d, idx) => (
-                                        <div key={idx} className="bg-white px-2.5 py-1.5 rounded-lg border border-slate-200 text-[11px] font-medium text-slate-700">
+                                        <div key={idx} className="bg-white px-2.5 py-1.5 rounded-lg border border-stone-200 text-[11px] font-medium text-stone-700">
                                           {d}
                                         </div>
                                       ))}
@@ -2786,14 +2650,14 @@
                     </div>
                   )}
 
-                  {/* TAB 5: บันทึกวัตถุดิบ เข้า - ออก */}
+                  {/* TAB 6: บันทึกวัตถุดิบ เข้า - ออก */}
                   {activeTab === 'movements' && (
-                    <div className="bg-white rounded-3xl p-4 sm:p-8 border border-slate-200/80 custom-shadow">
-                      <div className="mb-6 pb-4 border-b border-slate-100">
-                        <h2 className="text-lg sm:text-xl font-bold text-slate-800 flex items-center gap-2">
+                    <div className="bg-white rounded-3xl p-4 sm:p-8 border border-amber-200/60 custom-shadow">
+                      <div className="mb-6 pb-4 border-b border-stone-100">
+                        <h2 className="text-lg sm:text-xl font-bold text-amber-950 flex items-center gap-2">
                           <span>🔄</span> บันทึกการเข้า-ออกของวัตถุดิบ
                         </h2>
-                        <p className="text-xs text-slate-400 mt-1">ดูประวัติการเติมของเข้าคลัง หรือการเบิกเอาของออกไปหน้าร้าน</p>
+                        <p className="text-xs text-stone-400 mt-1">ดูประวัติการเติมของเข้าคลัง หรือการเบิกเอาของออกไปหน้าร้าน</p>
                       </div>
 
                       <div className="mb-5 relative">
@@ -2804,33 +2668,33 @@
                           onChange={(e) => setSearchMovement(e.target.value)}
                           className="w-full px-4 py-3 text-xs sm:text-sm rounded-xl custom-input pl-10"
                         />
-                        <span className="absolute left-3.5 top-3.5 text-slate-400 text-xs">🔍</span>
+                        <span className="absolute left-3.5 top-3.5 text-stone-400 text-xs">🔍</span>
                       </div>
 
                       {filteredMovements.length === 0 ? (
-                        <div className="text-center py-16 text-slate-400 text-xs sm:text-sm">ยังไม่มีประวัติการเติมหรือเบิกวัตถุดิบ</div>
+                        <div className="text-center py-16 text-stone-400 text-xs sm:text-sm">ยังไม่มีประวัติการเติมหรือเบิกวัตถุดิบ</div>
                       ) : (
                         <div className="space-y-3">
                           {filteredMovements.map(log => {
                             const isRestock = log.type === 'เติมสต๊อก';
                             return (
-                              <div key={log.id} className="bg-slate-50 border border-slate-200 p-4 rounded-2xl flex flex-col justify-between gap-3">
-                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/60 pb-2.5">
+                              <div key={log.id} className="bg-stone-50 border border-stone-200 p-4 rounded-2xl flex flex-col justify-between gap-3">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-200/60 pb-2.5">
                                   <div>
                                     <div className="flex items-center gap-2">
-                                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${isRestock ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${isRestock ? 'bg-amber-100 text-amber-900' : 'bg-orange-100 text-orange-900'}`}>
                                         {log.type}
                                       </span>
-                                      <span className="text-[11px] text-slate-400 font-medium">{log.datetime}</span>
+                                      <span className="text-[11px] text-stone-400 font-medium">{log.datetime}</span>
                                     </div>
-                                    <h3 className="font-bold text-sm sm:text-base text-slate-800 mt-1">{log.title}</h3>
-                                    {log.note && <p className="text-xs text-slate-500 italic mt-0.5">หมายเหตุ: {log.note}</p>}
+                                    <h3 className="font-bold text-sm sm:text-base text-amber-950 mt-1">{log.title}</h3>
+                                    {log.note && <p className="text-xs text-stone-500 italic mt-0.5">หมายเหตุ: {log.note}</p>}
                                   </div>
 
                                   <div className="flex items-center gap-2 self-end sm:self-center">
                                     <button
                                       onClick={() => setMovementToEdit(log)}
-                                      className="text-xs font-bold text-amber-600 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-3 py-1.5 rounded-xl transition flex items-center gap-1"
+                                      className="text-xs font-bold text-amber-800 bg-amber-100/60 hover:bg-amber-100 border border-amber-200 px-3 py-1.5 rounded-xl transition flex items-center gap-1"
                                     >
                                       <i data-lucide="edit-3" className="w-3.5 h-3.5"></i> แก้ไข
                                     </button>
@@ -2846,7 +2710,7 @@
                                 {log.details && (
                                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
                                     {log.details.map((d, idx) => (
-                                      <div key={idx} className="bg-white px-2.5 py-1.5 rounded-lg border border-slate-200 text-[11px] font-medium text-slate-700">
+                                      <div key={idx} className="bg-white px-2.5 py-1.5 rounded-lg border border-stone-200 text-[11px] font-medium text-stone-700">
                                         {d}
                                       </div>
                                     ))}
@@ -2865,8 +2729,8 @@
           </div>
 
           {/* Footer */}
-          <footer className="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-400 mt-8">
-            <p>© {new Date().getFullYear()} ระบบสต๊อก & ยอดขายร้านติดใจ (Mobile Edition)</p>
+          <footer className="bg-white border-t border-amber-200/60 py-4 text-center text-xs text-amber-900/50 mt-8">
+            <p>© {new Date().getFullYear()} ระบบสต๊อก & คิดเงินร้านติดใจ (Boba Milk Tea Edition)</p>
           </footer>
 
           {/* ALL MODALS */}
