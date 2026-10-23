@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>ระบบสต๊อก & ยอดขาย - ชานมกลมกล่อม</title>
-  <meta property="og:title" content="ระบบสต๊อก & ยอดขาย - ชานมกลมกล่อม" />
-  <meta property="og:description" content="ระบบจัดการสต๊อก คำนวณการปรุง และสรุปยอดขายชานมกลมกล่อม" />
+  <title>ระบบสต๊อก & ยอดขาย - เศรษฐีชา</title>
+  <meta property="og:title" content="ระบบสต๊อก & ยอดขาย - เศรษฐีชา" />
+  <meta property="og:description" content="ระบบจัดการสต๊อก สรุปยอดขาย และจัดการสถานะเมนู เศรษฐีชา" />
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -24,7 +24,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <style>
-    /* Boba Milk Tea Color Palette */
     body { 
       font-family: 'Prompt', sans-serif; 
       background-color: #f7f3ee;
@@ -230,7 +229,7 @@
       const todayStr = new Date().toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' });
 
       const handleShare = async () => {
-        let text = `📦 สรุปวัตถุดิบคงเหลือร้านชานมกลมกล่อม (${todayStr})\n------------------------\n`;
+        let text = `📦 สรุปวัตถุดิบคงเหลือร้านเศรษฐีชา (${todayStr})\n------------------------\n`;
         categorizedStocks.forEach(group => {
           if (group.items.length > 0) {
             text += `\n🏷️ [${group.categoryName}]\n`;
@@ -259,7 +258,7 @@
                   <i data-lucide="clipboard-check" className="w-5 h-5 text-amber-700"></i>
                   สรุปสต๊อกตามหมวดหมู่
                 </h3>
-                <p className="text-[10px] text-stone-400">ร้านชานมกลมกล่อม | ประจำวันที่ {todayStr}</p>
+                <p className="text-[10px] text-stone-400">ร้านเศรษฐีชา | ประจำวันที่ {todayStr}</p>
               </div>
               <button onClick={onClose} className="p-1 rounded-lg text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition">
                 <i data-lucide="x" className="w-5 h-5"></i>
@@ -306,7 +305,7 @@
       );
     }
 
-    // MODAL: แก้ไขบันทึกการผลิต/ขาย
+    // MODAL: แก้ไขบันทึกการสั่งซื้อ/ขาย
     function EditProductionLogModal({ isOpen, onClose, logToEdit, onSave }) {
       const [itemsMap, setItemsMap] = useState({});
       const [note, setNote] = useState('');
@@ -316,7 +315,7 @@
           setNote(logToEdit.note || '');
           const initialMap = {};
           if (logToEdit.title) {
-            const raw = logToEdit.title.replace(/^(สั่งปรุง\/ขาย|ปรุง|สั่งปรุง|ต้ม)\s+/, '').split(', ');
+            const raw = logToEdit.title.replace(/^(สั่งปรุง\/ขาย|ปรุง|สั่งปรุง|ต้ม|ออเดอร์ลูกค้าสแกน:)\s+/, '').split(', ');
             raw.forEach(item => {
               const match = item.match(/(.+) \((\d+) (ถัง|แก้ว|หม้อ|หน่วย)\)/);
               if (match) {
@@ -358,7 +357,7 @@
                 <div>
                   <h3 className="font-bold text-base text-amber-900 flex items-center gap-2">
                     <i data-lucide="edit-3" className="w-5 h-5 text-amber-700"></i>
-                    แก้ไขรายการสั่งปรุง/ขาย
+                    แก้ไขรายการสั่งซื้อ/ขาย
                   </h3>
                   <p className="text-[11px] text-stone-400">ปรับแก้จำนวน หรือลบรายการที่คีย์ผิดออกได้ทันที</p>
                 </div>
@@ -735,7 +734,7 @@
 
       productionLogs.forEach(l => {
         if (l.title) {
-          const items = l.title.replace(/^(สั่งปรุง\/ขาย|ปรุง|ต้ม)\s+/, '').split(', ');
+          const items = l.title.replace(/^(สั่งปรุง\/ขาย|ปรุง|ต้ม|ออเดอร์ลูกค้าสแกน:)\s+/, '').split(', ');
           items.forEach(item => {
             const match = item.match(/(.+) \((\d+) (ถัง|แก้ว|หม้อ|หน่วย)\)/);
             if (match) {
@@ -759,7 +758,7 @@
                 <div className="border-b-2 border-stone-900 pb-3 mb-4 flex justify-between items-end">
                   <div>
                     <h1 className="text-base sm:text-2xl font-black text-amber-950 tracking-tight">📄 รายงานสรุปประจำวัน</h1>
-                    <p className="text-[11px] sm:text-xs font-semibold text-stone-600 mt-0.5">ชานมกลมกล่อม | วันที่: {todayStr}</p>
+                    <p className="text-[11px] sm:text-xs font-semibold text-stone-600 mt-0.5">เศรษฐีชา | วันที่: {todayStr}</p>
                   </div>
                   <div className="text-right text-[10px] sm:text-xs text-stone-400 font-mono">
                     DAILY-REPORT
@@ -769,7 +768,7 @@
                 <div className="mb-4 bg-amber-50/60 p-3 sm:p-4 rounded-xl border border-amber-200">
                   <div className="flex justify-between items-center mb-2">
                     <h3 className="font-bold text-amber-950 text-xs sm:text-sm flex items-center gap-1.5">
-                      🧋 สรุปการสั่งปรุง / ขายประจำวัน
+                      🧋 สรุปการขายประจำวัน
                     </h3>
                     <span className="text-[10px] sm:text-xs font-extrabold bg-amber-200/60 text-amber-900 px-2.5 py-0.5 rounded-full">
                       รวม {totalBuckets} รายการ
@@ -777,7 +776,7 @@
                   </div>
 
                   {Object.keys(recipeSummary).length === 0 ? (
-                    <div className="text-[11px] text-stone-400 italic">ยังไม่มีบันทึกการปรุง/ขายในวันนี้</div>
+                    <div className="text-[11px] text-stone-400 italic">ยังไม่มีบันทึกการขายในวันนี้</div>
                   ) : (
                     <div className="grid grid-cols-2 gap-1.5 text-[11px] sm:text-xs">
                       {Object.entries(recipeSummary).map(([name, count]) => (
@@ -835,7 +834,7 @@
     // MODAL: เพิ่ม/แก้ไข สูตร BOM
     function RecipeModal({ isOpen, onClose, onSave, editingRecipe, stocks, handleImageUpload }) {
       const [name, setName] = useState('');
-      const [yieldInfo, setYieldInfo] = useState('1 ถัง');
+      const [yieldInfo, setYieldInfo] = useState('1 แก้ว');
       const [price, setPrice] = useState(35);
       const [image, setImage] = useState('');
       const [ingredients, setIngredients] = useState([]);
@@ -843,13 +842,13 @@
       useEffect(() => {
         if (editingRecipe) {
           setName(editingRecipe.name || '');
-          setYieldInfo(editingRecipe.yieldInfo || '1 ถัง');
+          setYieldInfo(editingRecipe.yieldInfo || '1 แก้ว');
           setPrice(editingRecipe.price !== undefined ? editingRecipe.price : 35);
           setImage(editingRecipe.image || '');
           setIngredients(editingRecipe.ingredients || []);
         } else {
           setName('');
-          setYieldInfo('1 ถัง');
+          setYieldInfo('1 แก้ว');
           setPrice(35);
           setImage('');
           setIngredients([]);
@@ -1026,11 +1025,14 @@
       const [pendingOrders, setPendingOrders] = useState([]);
       const [loading, setLoading] = useState(true);
 
+      // Accordion state for Daily Sales Logs
+      const [showDailyLogs, setShowDailyLogs] = useState(false);
+
       // Search & Filter States
-      const [searchProduction, setSearchProduction] = useState('');
       const [searchStock, setSearchStock] = useState('');
       const [selectedCategory, setSelectedCategory] = useState('all');
       const [searchRecipe, setSearchRecipe] = useState('');
+      const [searchMenuManage, setSearchMenuManage] = useState('');
       const [searchHistory, setSearchHistory] = useState('');
 
       // Daily Sales Filter Date State (ดูย้อนหลังได้)
@@ -1047,9 +1049,6 @@
         const d = new Date();
         return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2, '0')}`;
       });
-
-      const [batchQuantities, setBatchQuantities] = useState({});
-      const [productionNote, setProductionNote] = useState('');
 
       // Hidden items states for history
       const [unlockedLogDetails, setUnlockedLogDetails] = useState({});
@@ -1158,6 +1157,20 @@
           }
         } else {
           setActiveTab(tabName);
+        }
+      };
+
+      // สลับสถานะเปิด/ปิดการขายเมนู
+      const handleToggleMenuAvailability = async (recipe) => {
+        const currentStatus = recipe.isAvailable !== false;
+        const newStatus = !currentStatus;
+        try {
+          await db.collection('recipes').doc(recipe.id).update({
+            isAvailable: newStatus
+          });
+        } catch (err) {
+          console.error("Error toggling menu availability:", err);
+          alert("ไม่สามารถเปลี่ยนสถานะเมนูได้ กรุณาลองใหม่อีกครั้ง");
         }
       };
 
@@ -1321,10 +1334,6 @@
         }
       };
 
-      const filteredProductionRecipes = useMemo(() => {
-        return recipes.filter(r => r.name.toLowerCase().includes(searchProduction.toLowerCase()));
-      }, [recipes, searchProduction]);
-
       const filteredStocks = useMemo(() => {
         return stocks.filter(s => {
           const matchSearch = s.name.toLowerCase().includes(searchStock.toLowerCase()) || 
@@ -1337,6 +1346,10 @@
       const filteredRecipes = useMemo(() => {
         return recipes.filter(r => r.name.toLowerCase().includes(searchRecipe.toLowerCase()));
       }, [recipes, searchRecipe]);
+
+      const filteredManageRecipes = useMemo(() => {
+        return recipes.filter(r => r.name.toLowerCase().includes(searchMenuManage.toLowerCase()));
+      }, [recipes, searchMenuManage]);
 
       const filteredLogs = useMemo(() => {
         const prodLogs = logs.filter(l => l.type === 'สั่งปรุง/ขาย' || l.type === 'ปรุงผลิต');
@@ -1369,136 +1382,6 @@
         }
       };
 
-      // Production & Instant Checkout Handlers
-      const handleQuantityChange = (recipeId, delta) => {
-        setBatchQuantities(prev => {
-          const current = prev[recipeId] || 0;
-          const updated = Math.max(0, current + delta);
-          return { ...prev, [recipeId]: updated };
-        });
-      };
-
-      const handleRemoveFromProductionList = (recipeId) => {
-        setBatchQuantities(prev => {
-          const updated = { ...prev };
-          delete updated[recipeId];
-          return updated;
-        });
-      };
-
-      const handleSetQuantityDirectly = (recipeId, val) => {
-        const num = Math.max(0, parseInt(val, 10) || 0);
-        setBatchQuantities(prev => ({ ...prev, [recipeId]: num }));
-      };
-
-      const selectedProductionList = useMemo(() => {
-        return Object.entries(batchQuantities)
-          .filter(([_, qty]) => qty > 0)
-          .map(([recipeId, qty]) => {
-            const recipe = recipes.find(r => r.id === recipeId);
-            const unitPrice = recipe ? (recipe.price || 35) : 35;
-            return {
-              recipeId,
-              name: recipe ? recipe.name : 'เครื่องดื่ม',
-              qty,
-              price: unitPrice,
-              totalPrice: unitPrice * qty,
-              yieldInfo: recipe ? recipe.yieldInfo : '',
-              recipe
-            };
-          });
-      }, [batchQuantities, recipes]);
-
-      const grandTotalPrice = useMemo(() => {
-        return selectedProductionList.reduce((acc, curr) => acc + curr.totalPrice, 0);
-      }, [selectedProductionList]);
-
-      // ยืนยันการปรุง + คิดเงิน + ตัดสต๊อก + บันทึกยอดขาย (ผูก logId ใน sales)
-      const handleConfirmProductionAndCheckout = async () => {
-        if (selectedProductionList.length === 0) return alert('กรุณาเลือกรายการปรุง/เครื่องดื่มอย่างน้อย 1 รายการ');
-
-        try {
-          const batch = db.batch();
-          const deductionsSummary = {};
-
-          selectedProductionList.forEach(item => {
-            if (item.recipe && item.recipe.ingredients) {
-              item.recipe.ingredients.forEach(ing => {
-                const stockItem = stocks.find(s => s.id === ing.stockId);
-                if (stockItem) {
-                  const rawAmount = Number(ing.amount) * item.qty;
-                  const convertedAmount = convertUnitToStock(rawAmount, ing.unit, stockItem.unit);
-                  deductionsSummary[ing.stockId] = (deductionsSummary[ing.stockId] || 0) + convertedAmount;
-                }
-              });
-            }
-          });
-
-          Object.entries(deductionsSummary).forEach(([stockId, deductAmount]) => {
-            const stockRef = db.collection('stocks').doc(stockId);
-            batch.update(stockRef, {
-              current: firebase.firestore.FieldValue.increment(-deductAmount)
-            });
-          });
-
-          const titleText = selectedProductionList.map(item => `${item.name} (${item.qty} ${item.yieldInfo || 'หน่วย'})`).join(', ');
-          
-          const detailsList = Object.entries(deductionsSummary).map(([stockId, deductAmount]) => {
-            const stockItem = stocks.find(s => s.id === stockId);
-            return `${stockItem ? stockItem.name : 'วัตถุดิบ'}: -${deductAmount.toFixed(2)} ${stockItem ? stockItem.unit : ''}`;
-          });
-
-          const now = new Date();
-          const day = now.getDate().toString().padStart(2, '0');
-          const month = (now.getMonth() + 1).toString().padStart(2, '0');
-          const year = now.getFullYear();
-          const yearTH = year + 543;
-          const hours = now.getHours().toString().padStart(2, '0');
-          const mins = now.getMinutes().toString().padStart(2, '0');
-          const timeStr = `${day}/${month}/${yearTH} ${hours}:${mins} น.`;
-          const dateISO = `${year}-${month}-${day}`;
-
-          const logRef = db.collection('logs').doc();
-          const newLogId = logRef.id;
-
-          batch.set(logRef, {
-            datetime: timeStr,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-            type: 'สั่งปรุง/ขาย',
-            title: `สั่งปรุง/ขาย ${titleText}`,
-            details: detailsList,
-            rawDeductions: deductionsSummary,
-            totalAmount: grandTotalPrice,
-            note: productionNote || 'สั่งปรุงและคิดเงินหน้าร้าน'
-          });
-
-          selectedProductionList.forEach(item => {
-            const saleRef = db.collection('sales').doc();
-            batch.set(saleRef, {
-              logId: newLogId, // ผูก ID เพื่อใช้ลบพร้อมกันได้
-              recipeId: item.recipeId,
-              menuName: item.name,
-              cups: Number(item.qty),
-              pricePerCup: Number(item.price),
-              totalAmount: Number(item.totalPrice),
-              note: productionNote || '',
-              datetime: timeStr,
-              dateISO: dateISO,
-              monthKey: `${year}-${month}`,
-              timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            });
-          });
-
-          await batch.commit();
-          alert(`✅ บันทึกสั่งปรุง คิดเงิน (${grandTotalPrice.toLocaleString()} ฿) และตัดสต๊อกเรียบร้อยแล้ว!`);
-          setBatchQuantities({});
-          setProductionNote('');
-        } catch (error) {
-          console.error("Error confirming production and checkout:", error);
-          alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
-        }
-      };
-
       const handleSaveProductionEdit = async (logItem, updatedItemsMap, newNote) => {
         try {
           const titleText = Object.entries(updatedItemsMap)
@@ -1507,7 +1390,7 @@
 
           const logRef = db.collection('logs').doc(logItem.id);
           await logRef.update({
-            title: titleText ? `สั่งปรุง/ขาย ${titleText}` : 'ยกเลิกรายการสั่งปรุง',
+            title: titleText ? `ออเดอร์: ${titleText}` : 'ยกเลิกรายการสั่งปรุง',
             note: newNote
           });
 
@@ -1646,7 +1529,10 @@
             await db.collection('recipes').doc(id).update(recipeObj);
           } else {
             delete recipeObj.id;
-            await db.collection('recipes').add(recipeObj);
+            await db.collection('recipes').add({
+              ...recipeObj,
+              isAvailable: true // ตั้งค่าเริ่มต้นให้เปิดขายทันที
+            });
           }
           setRecipeModalOpen(false);
           alert('บันทึกสูตรเรียบร้อยแล้ว');
@@ -1667,8 +1553,8 @@
                     <i data-lucide="cup-soda" className="w-5 h-5 sm:w-6 sm:h-6"></i>
                   </div>
                   <div>
-                    <h1 className="font-bold text-amber-950 text-base sm:text-lg tracking-tight leading-none">ชานมกลมกล่อม</h1>
-                    <p className="text-[10px] text-amber-800/70 font-semibold mt-0.5">ระบบสั่งปรุง สต๊อก & สรุปยอดขาย</p>
+                    <h1 className="font-bold text-amber-950 text-base sm:text-lg tracking-tight leading-none">เศรษฐีชา</h1>
+                    <p className="text-[10px] text-amber-800/70 font-semibold mt-0.5">ระบบจัดการสต๊อก & สรุปยอดขาย</p>
                   </div>
                 </div>
 
@@ -1705,9 +1591,9 @@
                     )}
                   </button>
 
-                  <button onClick={() => handleTabChange('production')} className={`flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'production' ? 'bg-amber-800 text-white shadow-sm' : 'text-stone-600 hover:text-amber-950'}`}>
-                    <i data-lucide="flame" className="w-4 h-4"></i>
-                    <span>🧋 สั่งปรุง & คิดเงิน</span>
+                  <button onClick={() => handleTabChange('menuManage')} className={`flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'menuManage' ? 'bg-amber-800 text-white shadow-sm' : 'text-stone-600 hover:text-amber-950'}`}>
+                    <i data-lucide="toggle-left" className="w-4 h-4"></i>
+                    <span>🍹 เมนูหน้าร้าน & เปิด/ปิดขาย</span>
                   </button>
 
                   <button onClick={() => handleTabChange('salesSummary')} className={`flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'salesSummary' ? 'bg-amber-800 text-white shadow-sm' : 'text-stone-600 hover:text-amber-950'}`}>
@@ -1729,7 +1615,7 @@
 
                   <button onClick={() => handleTabChange('history')} className={`flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'history' ? 'bg-amber-800 text-white shadow-sm' : 'text-stone-600 hover:text-amber-950'}`}>
                     <i data-lucide="history" className="w-4 h-4"></i>
-                    <span>📜 ประวัติสั่งปรุง/ขาย</span>
+                    <span>📜 ประวัติบันทึกการขาย</span>
                   </button>
                 </div>
               </div>
@@ -1739,7 +1625,7 @@
             <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 my-4 sm:my-6">
 
               {loading ? (
-                <div className="text-center py-20 text-amber-900 font-medium text-sm">กำลังโหลดข้อมูลชานมกลมกล่อม...</div>
+                <div className="text-center py-20 text-amber-900 font-medium text-sm">กำลังโหลดข้อมูลระบบเศรษฐีชา...</div>
               ) : (
                 <>
                   {/* TAB 0: ออเดอร์เด้งเข้า Real-time จากลูกค้าสแกน */}
@@ -1816,187 +1702,73 @@
                     </div>
                   )}
 
-                  {/* TAB 1: สั่งปรุง & คิดเงิน */}
-                  {activeTab === 'production' && (
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                      <div className="lg:col-span-7 bg-white rounded-3xl p-4 sm:p-8 border border-amber-200/60 custom-shadow">
-                        <div className="mb-4 sm:mb-6">
-                          <h2 className="text-lg sm:text-xl font-bold text-amber-950 flex items-center gap-2">
-                            <span>🧋</span> สั่งปรุง & คิดเงินหน้าร้าน
-                          </h2>
-                          <p className="text-xs text-stone-400 mt-1">กดเลือกเมนูเครื่องดื่มและจำนวนถัง/แก้ว ระบบจะคำนวณเงินและตัดสต๊อกอัตโนมัติ</p>
-                        </div>
-
-                        <div className="mb-4 relative">
-                          <input
-                            type="text"
-                            placeholder="ค้นหาชื่อสูตร / เมนูเครื่องดื่ม..."
-                            value={searchProduction}
-                            onChange={(e) => setSearchProduction(e.target.value)}
-                            className="w-full px-4 py-3 text-xs sm:text-sm rounded-xl custom-input pl-10"
-                          />
-                          <span className="absolute left-3.5 top-3.5 text-stone-400 text-xs">🔍</span>
-                          {searchProduction && (
-                            <button onClick={() => setSearchProduction('')} className="absolute right-3 top-3 text-stone-400 text-xs hover:text-stone-600 font-bold">✕</button>
-                          )}
-                        </div>
-
-                        {filteredProductionRecipes.length === 0 ? (
-                          <div className="text-center py-12 text-stone-400 text-sm">ไม่พบสูตรน้ำปรุง/เมนูที่ค้นหา</div>
-                        ) : (
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6">
-                            {filteredProductionRecipes.map(recipe => {
-                              const qty = batchQuantities[recipe.id] || 0;
-                              const isSelected = qty > 0;
-                              const price = recipe.price || 35;
-                              return (
-                                <div key={recipe.id} className={`border-2 rounded-2xl p-3.5 sm:p-4 transition-all duration-200 relative flex flex-col justify-between ${isSelected ? 'border-amber-700 bg-amber-50/60' : 'border-amber-100 bg-white hover:border-amber-300'}`}>
-                                  {isSelected && (
-                                    <div className="absolute top-3 right-3 bg-amber-800 text-white rounded-full p-0.5">
-                                      <i data-lucide="check" className="w-3.5 h-3.5"></i>
-                                    </div>
-                                  )}
-
-                                  <div className="flex items-center space-x-3 mb-3">
-                                    <img src={recipe.image || DEFAULT_IMAGE} className="w-14 h-14 rounded-2xl object-cover border border-amber-200 shadow-sm" alt={recipe.name} />
-                                    <div>
-                                      <h3 className="font-bold text-amber-950 text-sm sm:text-base">{recipe.name}</h3>
-                                      <div className="flex items-center gap-2 mt-0.5">
-                                        <span className="text-xs font-black text-amber-800 bg-amber-100 px-2 py-0.5 rounded-lg">{price} ฿</span>
-                                        <span className="text-[11px] text-stone-400">/{recipe.yieldInfo || 'ถัง'}</span>
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  <div className="bg-stone-50 border border-stone-200 rounded-xl p-1 flex items-center justify-between">
-                                    <button 
-                                      onClick={() => handleQuantityChange(recipe.id, -1)} 
-                                      disabled={qty === 0}
-                                      className={`w-10 h-10 rounded-lg font-bold text-lg transition flex items-center justify-center shadow-sm ${qty > 0 ? 'bg-white border border-stone-300 text-stone-700 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 active:scale-95' : 'bg-stone-100 text-stone-300 border border-stone-200 cursor-not-allowed'}`}
-                                    >
-                                      -
-                                    </button>
-                                    <div className="text-center flex-1 px-1">
-                                      <span className="font-bold text-base sm:text-lg text-amber-950">{qty}</span>
-                                      <span className="text-[9px] text-stone-400 block -mt-1 font-medium">หน่วย</span>
-                                    </div>
-                                    <button onClick={() => handleQuantityChange(recipe.id, 1)} className="w-10 h-10 rounded-lg bg-amber-800 font-bold text-lg text-white hover:bg-amber-900 active:scale-95 transition flex items-center justify-center shadow-md shadow-amber-900/20">
-                                      +
-                                    </button>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
-
-                        <div className="mt-4">
-                          <label className="block text-xs font-semibold text-stone-600 mb-1.5">หมายเหตุ / ชื่อผู้สั่งซื้อ</label>
-                          <input type="text" placeholder="เช่น หวาน 50% / โต๊ะ 1 / เบิกหน้าร้าน..." value={productionNote} onChange={(e) => setProductionNote(e.target.value)} className="w-full px-4 py-3 text-sm rounded-xl custom-input" />
-                        </div>
+                  {/* TAB NEW: จัดการเปิด/ปิดการขายเมนูหน้าร้าน */}
+                  {activeTab === 'menuManage' && (
+                    <div className="bg-white rounded-3xl p-4 sm:p-8 border border-amber-200/60 custom-shadow">
+                      <div className="mb-6 pb-4 border-b border-stone-100">
+                        <h2 className="text-lg sm:text-xl font-bold text-amber-950 flex items-center gap-2">
+                          <span>🍹</span> จัดการรายการเมนู & เปิด/ปิดการขายหน้าร้าน
+                        </h2>
+                        <p className="text-xs text-stone-400 mt-1">หากวัตถุดิบรายการใดหมด สามารถกดปิดการขายที่นี่เพื่อให้หน้าร้านของลูกค้าแสดงผลทันที</p>
                       </div>
 
-                      {/* สรุปตระกร้าคิดเงิน */}
-                      <div className="lg:col-span-5">
-                        <div className="bg-[#2b1e16] text-white rounded-3xl p-5 sm:p-8 shadow-2xl sticky top-28 border border-amber-900/40">
-                          <div className="flex items-center justify-between pb-4 border-b border-amber-900/60 mb-4 sm:mb-6">
-                            <div className="flex items-center gap-3">
-                              <div className="bg-amber-500/10 p-2 rounded-xl text-amber-400">
-                                <i data-lucide="shopping-bag" className="w-5 h-5 sm:w-6 sm:h-6"></i>
-                              </div>
-                              <div>
-                                <h2 className="font-bold text-base sm:text-lg text-amber-100">สรุปรายการคิดเงิน & ปรุง</h2>
-                                <p className="text-[11px] text-amber-200/60">รายการที่เลือกทั้งหมด</p>
-                              </div>
-                            </div>
-                            {selectedProductionList.length > 0 && (
-                              <button 
-                                onClick={() => setBatchQuantities({})}
-                                className="text-rose-400 hover:text-rose-300 text-xs font-medium bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 px-2.5 py-1.5 rounded-xl transition flex items-center gap-1"
-                              >
-                                <i data-lucide="rotate-ccw" className="w-3.5 h-3.5"></i> รีเซ็ต
-                              </button>
-                            )}
-                          </div>
+                      <div className="mb-5 relative">
+                        <input
+                          type="text"
+                          placeholder="ค้นหาชื่อเมนู..."
+                          value={searchMenuManage}
+                          onChange={(e) => setSearchMenuManage(e.target.value)}
+                          className="w-full px-4 py-3 text-xs sm:text-sm rounded-xl custom-input pl-10"
+                        />
+                        <span className="absolute left-3.5 top-3.5 text-stone-400 text-xs">🔍</span>
+                      </div>
 
-                          <div className="bg-[#3d2b1f] border border-amber-600/30 rounded-2xl p-3.5 mb-3 flex justify-between items-center text-xs">
-                            <span className="text-amber-200/80 font-semibold">ยอดรวมชำระเงิน:</span>
-                            <span className="text-xl font-black text-amber-400">
-                              {grandTotalPrice.toLocaleString()} <span className="text-xs font-normal text-amber-200">บาท</span>
-                            </span>
-                          </div>
-
-                          <div className="space-y-2.5 min-h-[140px] max-h-[280px] overflow-y-auto pr-1">
-                            {selectedProductionList.length === 0 ? (
-                              <div className="text-center py-10 text-stone-500 text-xs sm:text-sm font-medium">ยังไม่มีรายการที่เลือก<br/><span className="text-[10px] text-stone-600">กดปุ่ม + ด้านซ้ายเพื่อเลือกเครื่องดื่ม</span></div>
-                            ) : (
-                              selectedProductionList.map(item => (
-                                <div key={item.recipeId} className="bg-[#3d2b1f] border border-amber-900/40 rounded-2xl p-3 flex justify-between items-center gap-2">
-                                  <div className="flex items-center space-x-2.5 min-w-0">
-                                    <img src={item.recipe?.image || DEFAULT_IMAGE} className="w-10 h-10 rounded-xl object-cover border border-amber-800 shrink-0" alt={item.name} />
-                                    <div className="min-w-0">
-                                      <div className="font-bold text-xs sm:text-sm text-amber-100 truncate">{item.name}</div>
-                                      <div className="text-[10px] text-amber-300">{item.price} ฿ × {item.qty} = <strong className="text-amber-400">{item.totalPrice} ฿</strong></div>
-                                    </div>
-                                  </div>
-                                  <div className="flex items-center space-x-2 shrink-0">
-                                    <div className="flex items-center bg-[#2b1e16] border border-amber-800/80 rounded-xl p-1">
-                                      <button 
-                                        onClick={() => handleQuantityChange(item.recipeId, -1)}
-                                        className="w-6 h-6 rounded-lg bg-stone-800 text-stone-300 hover:text-white hover:bg-stone-700 text-xs font-bold transition flex items-center justify-center"
-                                      >
-                                        -
-                                      </button>
-                                      <input 
-                                        type="number" 
-                                        value={item.qty} 
-                                        onChange={(e) => handleSetQuantityDirectly(item.recipeId, e.target.value)}
-                                        className="w-10 text-center font-extrabold text-xs text-amber-400 bg-transparent focus:outline-none"
-                                      />
-                                      <button 
-                                        onClick={() => handleQuantityChange(item.recipeId, 1)}
-                                        className="w-6 h-6 rounded-lg bg-amber-700 text-white hover:bg-amber-600 text-xs font-bold transition flex items-center justify-center"
-                                      >
-                                        +
-                                      </button>
-                                    </div>
-                                    <button 
-                                      onClick={() => handleRemoveFromProductionList(item.recipeId)}
-                                      className="p-1.5 text-stone-500 hover:text-rose-400 rounded-lg transition"
-                                      title="ลบรายการนี้"
-                                    >
-                                      <i data-lucide="trash-2" className="w-4 h-4"></i>
-                                    </button>
+                      {filteredManageRecipes.length === 0 ? (
+                        <div className="text-center py-16 text-stone-400 text-xs sm:text-sm">ไม่พบเมนูเครื่องดื่ม</div>
+                      ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                          {filteredManageRecipes.map(recipe => {
+                            const isAvailable = recipe.isAvailable !== false; // default true
+                            return (
+                              <div key={recipe.id} className={`p-4 rounded-2xl border transition-all duration-200 flex items-center justify-between gap-3 ${isAvailable ? 'bg-white border-amber-100 custom-shadow' : 'bg-stone-50 border-stone-200 opacity-75'}`}>
+                                <div className="flex items-center space-x-3 min-w-0">
+                                  <img src={recipe.image || DEFAULT_IMAGE} className="w-12 h-12 rounded-xl object-cover border shrink-0" alt={recipe.name} />
+                                  <div className="min-w-0">
+                                    <h3 className="font-bold text-amber-950 text-sm truncate">{recipe.name}</h3>
+                                    <span className="text-xs font-extrabold text-amber-800">{recipe.price || 35} ฿</span>
                                   </div>
                                 </div>
-                              ))
-                            )}
-                          </div>
 
-                          <button 
-                            onClick={handleConfirmProductionAndCheckout} 
-                            disabled={selectedProductionList.length === 0} 
-                            className={`w-full mt-5 py-4 rounded-2xl font-bold text-sm sm:text-base transition-all duration-200 flex items-center justify-center gap-2 ${selectedProductionList.length > 0 ? 'bg-amber-500 text-amber-950 hover:bg-amber-400 shadow-lg shadow-amber-500/20 active:scale-98' : 'bg-stone-800/60 text-stone-500 cursor-not-allowed'}`}
-                          >
-                            <i data-lucide="check-circle-2" className="w-5 h-5"></i>
-                            ยืนยันสั่งปรุง & คิดเงิน ({grandTotalPrice.toLocaleString()} ฿)
-                          </button>
+                                <button
+                                  onClick={() => handleToggleMenuAvailability(recipe)}
+                                  className={`px-3 py-1.5 rounded-xl font-bold text-xs transition flex items-center gap-1.5 shrink-0 ${
+                                    isAvailable 
+                                      ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 hover:bg-emerald-200' 
+                                      : 'bg-rose-100 text-rose-700 border border-rose-300 hover:bg-rose-200'
+                                  }`}
+                                >
+                                  <span className={`w-2 h-2 rounded-full ${isAvailable ? 'bg-emerald-500' : 'bg-rose-500'}`}></span>
+                                  {isAvailable ? 'พร้อมขาย' : 'สินค้าหมด'}
+                                </button>
+                              </div>
+                            );
+                          })}
                         </div>
-                      </div>
+                      )}
                     </div>
                   )}
 
-                  {/* TAB 2: สรุปยอดขาย (ดูย้อนหลังได้ทั้งรายวันและรายเดือน) */}
+                  {/* TAB 2: สรุปยอดขาย */}
                   {activeTab === 'salesSummary' && (
                     <div className="space-y-6">
-                      {/* สรุปรายวัน - เลือกวันที่ย้อนหลังได้ */}
+                      {/* สรุปรายวัน */}
                       <div className="bg-white rounded-3xl p-5 sm:p-8 border border-amber-200/60 custom-shadow">
                         <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 pb-4 border-b border-stone-100 mb-4">
                           <div>
                             <h2 className="text-lg font-bold text-amber-950 flex items-center gap-2">
-                              <span>📅</span> สรุปยอดขายรายวัน (เลือกดูย้อนหลัง)
+                              <span>📅</span> สรุปยอดขายรายวัน
                             </h2>
-                            <p className="text-xs text-stone-400 mt-0.5">เลือกระบุวันที่เพื่อดูสถิติการขายและออเดอร์ในวันนั้นๆ</p>
+                            <p className="text-xs text-stone-400 mt-0.5">เลือกระบุวันที่เพื่อดูสถิติการขายประจำวัน</p>
                           </div>
 
                           <div className="flex items-center gap-2">
@@ -2018,7 +1790,7 @@
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
                           <div className="bg-amber-50 border border-amber-200/80 rounded-2xl p-4 text-center">
                             <span className="text-xs font-bold text-amber-800 block">ยอดขายรวมประจำวัน</span>
                             <span className="text-2xl sm:text-3xl font-black text-amber-700 mt-1 block">
@@ -2041,36 +1813,45 @@
                           </div>
                         </div>
 
-                        {/* ตารางออเดอร์รายวัน */}
-                        <div>
-                          <h3 className="font-bold text-sm text-stone-700 mb-3">รายการขายในวันที่ {selectedDailyDate} ({selectedDailySalesSummary.logs.length} รายการ)</h3>
-                          {selectedDailySalesSummary.logs.length === 0 ? (
-                            <div className="text-center py-8 text-stone-400 text-xs italic">ไม่มีข้อมูลการขายในวันที่เลือก</div>
-                          ) : (
-                            <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
-                              {selectedDailySalesSummary.logs.map(log => (
-                                <div key={log.id} className="bg-stone-50 border border-stone-200 p-3 rounded-2xl flex items-center justify-between gap-2 text-xs">
-                                  <div>
-                                    <span className="font-bold text-amber-950 text-sm block">{log.menuName}</span>
-                                    <span className="text-stone-400 text-[11px]">{log.datetime} {log.note ? `• ${log.note}` : ''}</span>
-                                  </div>
-                                  <div className="flex items-center gap-3">
-                                    <div className="text-right">
-                                      <span className="font-black text-amber-800 text-sm block">+{log.totalAmount} ฿</span>
-                                      <span className="text-[10px] text-stone-500">{log.cups} หน่วย @ {log.pricePerCup}฿</span>
+                        {/* ตารางรายการขายในวันที่ (ทำเป็นปุ่มกดพับเก็บได้) */}
+                        <div className="pt-2 border-t border-stone-100">
+                          <button
+                            onClick={() => setShowDailyLogs(!showDailyLogs)}
+                            className="w-full py-2.5 px-4 bg-stone-50 hover:bg-stone-100 border border-stone-200 rounded-xl flex justify-between items-center text-xs font-bold text-amber-950 transition"
+                          >
+                            <span>📋 รายการขายในวันที่ {selectedDailyDate} ({selectedDailySalesSummary.logs.length} รายการ)</span>
+                            <span>{showDailyLogs ? '▲ ซ่อนรายการ' : '▼ แสดงรายการ'}</span>
+                          </button>
+
+                          {showDailyLogs && (
+                            <div className="mt-3 space-y-2 max-h-[300px] overflow-y-auto pr-1">
+                              {selectedDailySalesSummary.logs.length === 0 ? (
+                                <div className="text-center py-6 text-stone-400 text-xs italic">ไม่มีข้อมูลการขายในวันที่เลือก</div>
+                              ) : (
+                                selectedDailySalesSummary.logs.map(log => (
+                                  <div key={log.id} className="bg-stone-50 border border-stone-200 p-3 rounded-2xl flex items-center justify-between gap-2 text-xs">
+                                    <div>
+                                      <span className="font-bold text-amber-950 text-sm block">{log.menuName}</span>
+                                      <span className="text-stone-400 text-[11px]">{log.datetime} {log.note ? `• ${log.note}` : ''}</span>
                                     </div>
-                                    <button onClick={() => handleDeleteSale(log.id)} className="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg">
-                                      <i data-lucide="trash-2" className="w-4 h-4"></i>
-                                    </button>
+                                    <div className="flex items-center gap-3">
+                                      <div className="text-right">
+                                        <span className="font-black text-amber-800 text-sm block">+{log.totalAmount} ฿</span>
+                                        <span className="text-[10px] text-stone-500">{log.cups} หน่วย @ {log.pricePerCup}฿</span>
+                                      </div>
+                                      <button onClick={() => handleDeleteSale(log.id)} className="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg">
+                                        <i data-lucide="trash-2" className="w-4 h-4"></i>
+                                      </button>
+                                    </div>
                                   </div>
-                                </div>
-                              ))}
+                                ))
+                              )}
                             </div>
                           )}
                         </div>
                       </div>
 
-                      {/* สรุปรายเดือน */}
+                      {/* สรุปรายเดือน (เอาประวัติออกแล้ว) */}
                       <div className="bg-white rounded-3xl p-5 sm:p-8 border border-amber-200/60 custom-shadow">
                         <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 pb-4 border-b border-stone-100 mb-4">
                           <div>
@@ -2088,7 +1869,7 @@
                           />
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                           <div className="bg-[#2b1e16] text-white rounded-2xl p-4 text-center">
                             <span className="text-xs font-semibold text-amber-200/70 block">รายได้สะสมประจำเดือน</span>
                             <span className="text-2xl sm:text-3xl font-black text-amber-400 mt-1 block">
@@ -2109,33 +1890,6 @@
                               {monthSalesSummary.avgDailyMoney.toLocaleString()} <span className="text-xs font-normal">บาท/วัน</span>
                             </span>
                           </div>
-                        </div>
-
-                        <div>
-                          <h3 className="font-bold text-sm text-stone-700 mb-3">ประวัติรายการขายเดือนนี้ ({monthSalesSummary.monthLogs.length} รายการ)</h3>
-                          {monthSalesSummary.monthLogs.length === 0 ? (
-                            <div className="text-center py-8 text-stone-400 text-xs italic">ไม่มีข้อมูลการขายในเดือนนี้</div>
-                          ) : (
-                            <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
-                              {monthSalesSummary.monthLogs.map(log => (
-                                <div key={log.id} className="bg-stone-50 border border-stone-200 p-3 rounded-2xl flex items-center justify-between gap-2 text-xs">
-                                  <div>
-                                    <span className="font-bold text-amber-950 text-sm block">{log.menuName}</span>
-                                    <span className="text-stone-400 text-[11px]">{log.datetime} {log.note ? `• ${log.note}` : ''}</span>
-                                  </div>
-                                  <div className="flex items-center gap-3">
-                                    <div className="text-right">
-                                      <span className="font-black text-amber-800 text-sm block">+{log.totalAmount} ฿</span>
-                                      <span className="text-[10px] text-stone-500">{log.cups} หน่วย @ {log.pricePerCup}฿</span>
-                                    </div>
-                                    <button onClick={() => handleDeleteSale(log.id)} className="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg">
-                                      <i data-lucide="trash-2" className="w-4 h-4"></i>
-                                    </button>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          )}
                         </div>
                       </div>
                     </div>
@@ -2307,7 +2061,7 @@
                           <h2 className="text-lg sm:text-xl font-bold text-amber-950 flex items-center gap-2">
                             <span>📖</span> จัดการสูตรการผลิต & ราคาขาย (BOM)
                           </h2>
-                          <p className="text-xs text-stone-400 mt-1">ตั้งค่าส่วนผสมและกำหนดราคาขายต่อแก้ว/ถัง เพื่อคำนวณเงินและตัดสต๊อกอัตโนมัติ</p>
+                          <p className="text-xs text-stone-400 mt-1">ตั้งค่าส่วนผสมและกำหนดราคาขายต่อแก้ว เพื่อให้ระบบตัดสต๊อกอัตโนมัติเมื่อลูกค้ารับออเดอร์</p>
                         </div>
                         <button
                           onClick={() => { setEditingRecipe(null); setRecipeModalOpen(true); }}
@@ -2345,7 +2099,7 @@
                                           ราคา {recipe.price || 35} ฿
                                         </span>
                                         <span className="text-[11px] text-stone-400">
-                                          ต่อ {recipe.yieldInfo || 'ถัง'}
+                                          ต่อ {recipe.yieldInfo || 'แก้ว'}
                                         </span>
                                       </div>
                                     </div>
@@ -2388,20 +2142,20 @@
                     </div>
                   )}
 
-                  {/* TAB 5: ประวัติสั่งปรุง/ขาย */}
+                  {/* TAB 5: ประวัติบันทึกการขาย */}
                   {activeTab === 'history' && (
                     <div className="bg-white rounded-3xl p-4 sm:p-8 border border-amber-200/60 custom-shadow">
                       <div className="mb-6 pb-4 border-b border-stone-100">
                         <h2 className="text-lg sm:text-xl font-bold text-amber-950 flex items-center gap-2">
-                          <span>📜</span> ประวัติบันทึกการสั่งปรุง & ขาย
+                          <span>📜</span> ประวัติบันทึกการขาย
                         </h2>
-                        <p className="text-xs text-stone-400 mt-1">ตรวจสอบประวัติการปรุง ยอดตัดสต๊อก หรือแก้ไข/ลบรายการที่บันทึกผิด (ระบบจะลบยอดขายออกด้วย)</p>
+                        <p className="text-xs text-stone-400 mt-1">ตรวจสอบประวัติการรับออเดอร์ ยอดตัดสต๊อก หรือแก้ไข/ลบรายการที่บันทึกผิด</p>
                       </div>
 
                       <div className="mb-5 relative">
                         <input
                           type="text"
-                          placeholder="ค้นหาประวัติการปรุง/ขาย..."
+                          placeholder="ค้นหาประวัติ..."
                           value={searchHistory}
                           onChange={(e) => setSearchHistory(e.target.value)}
                           className="w-full px-4 py-3 text-xs sm:text-sm rounded-xl custom-input pl-10"
@@ -2410,7 +2164,7 @@
                       </div>
 
                       {filteredLogs.length === 0 ? (
-                        <div className="text-center py-16 text-stone-400 text-xs sm:text-sm">ยังไม่มีประวัติการสั่งปรุง</div>
+                        <div className="text-center py-16 text-stone-400 text-xs sm:text-sm">ยังไม่มีประวัติการขาย</div>
                       ) : (
                         <div className="space-y-3">
                           {filteredLogs.map(log => {
@@ -2421,7 +2175,7 @@
                                   <div>
                                     <div className="flex items-center gap-2">
                                       <span className="bg-amber-800 text-amber-100 text-[10px] font-bold px-2 py-0.5 rounded-md">
-                                        {log.type || 'สั่งปรุง/ขาย'}
+                                        {log.type || 'สั่งซื้อ/ขาย'}
                                       </span>
                                       <span className="text-[11px] text-stone-400 font-medium">{log.datetime}</span>
                                     </div>
@@ -2481,7 +2235,7 @@
 
           {/* Footer */}
           <footer className="bg-white border-t border-amber-200/60 py-4 text-center text-xs text-amber-900/50 mt-8">
-            <p>© {new Date().getFullYear()} ระบบสต๊อก & คิดเงิน - ชานมกลมกล่อม</p>
+            <p>© {new Date().getFullYear()} ระบบสต๊อก & คิดเงิน - เศรษฐีชา</p>
           </footer>
 
           {/* ALL MODALS */}
