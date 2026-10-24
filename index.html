@@ -1015,7 +1015,6 @@
     // MAIN APP COMPONENT
     function App() {
       const [activeTab, setActiveTab] = useState('ordersTab');
-      const [isBomUnlocked, setIsBomUnlocked] = useState(false);
 
       const [stocks, setStocks] = useState([]);
       const [recipes, setRecipes] = useState([]);
@@ -1147,17 +1146,7 @@
       }, []);
 
       const handleTabChange = (tabName) => {
-        if (tabName === 'bom' && !isBomUnlocked) {
-          const pass = prompt('🔐 กรุณากรอกรหัสผ่านเพื่อเข้าถึง "สูตรการผลิต (BOM)":');
-          if (pass === MASTER_PASSWORD) {
-            setIsBomUnlocked(true);
-            setActiveTab('bom');
-          } else if (pass !== null) {
-            alert('❌ รหัสผ่านไม่ถูกต้อง');
-          }
-        } else {
-          setActiveTab(tabName);
-        }
+        setActiveTab(tabName);
       };
 
       // สลับสถานะเปิด/ปิดการขายเมนู
@@ -1610,7 +1599,6 @@
                   <button onClick={() => handleTabChange('bom')} className={`flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'bom' ? 'bg-amber-800 text-white shadow-sm' : 'text-stone-600 hover:text-amber-950'}`}>
                     <i data-lucide="book-open" className="w-4 h-4"></i>
                     <span>📖 สูตรการผลิต & ราคา (BOM)</span>
-                    {!isBomUnlocked && <span className="text-[10px]">🔒</span>}
                   </button>
 
                   <button onClick={() => handleTabChange('history')} className={`flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${activeTab === 'history' ? 'bg-amber-800 text-white shadow-sm' : 'text-stone-600 hover:text-amber-950'}`}>
